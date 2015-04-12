@@ -24,6 +24,7 @@ import com.forum.web.atom.AtomFeed;
 import com.forum.web.atom.Author;
 import com.forum.web.atom.Contributor;
 import com.forum.web.dao.ChannelDao;
+import com.forum.web.dao.EntryDao;
 import com.forum.web.dao.FeedDao;
 import com.forum.web.parse.Parser;
 
@@ -44,14 +45,19 @@ public class EntryDaoTests {
 	private AtomFeed feed3;
 	private List<AtomEntry> entries1;
 	private List<AtomEntry> entries2;
+	private AtomEntry entry1;
+	private AtomEntry entry2;
+	private AtomEntry entry3;
 	private long date1;
 	private long date2;
 	private Author author1;
 	private Author author2;
 	private Author author3;
-	private Author author4;
+	private Author author4;	
+	private Author author5;
 	private Set<Author> authors1;
 	private Set<Author> authors2;
+	private Set<Author> authors3;
 
 	private Set<Contributor> contributors;
 	private List<String> categories1;
@@ -62,8 +68,11 @@ public class EntryDaoTests {
 	private ChannelDao channelDao;
 	
 	@Autowired
+	private EntryDao entryDao;
+
+	@Autowired
 	private FeedDao feedDao;
-	
+
 	@Autowired
 	private DataSource dataSource;
 	
@@ -76,22 +85,26 @@ public class EntryDaoTests {
 		date1 = Parser.parseDate("2015-04-09T12:10:02-04:00"); // 4/9/2015
 		date2 = Parser.parseDate("2015-04-04T12:10:02-04:00"); // 4/4/2015
 		author1 = new Author("george");
-		author1.setEmail("george@gmail.com");
+		author1.setEmail("george@example.com");
 		author1.setUri("georgeswebsite.com");
 		author2 = new Author("bill");
-		author2.setEmail("bill@gmail.com");
+		author2.setEmail("bill@example.com");
 		author2.setUri("billswebsite.com");
 		authors1 = new HashSet<Author>();
 		authors1.add(author1);
 		authors1.add(author2);
-		author3 = new Author("bill");
-		author3.setEmail("bill@gmail.com");
-		author4 = new Author("george");
-		author4.setEmail("george@gmail.com");
+		author3 = new Author("Dan");
+		author3.setEmail("dan@example.com");
+		author4 = new Author("Daniel");
+		author4.setEmail("daniel@example.com");
+		author5 = new Author("Danny");
+		author5.setEmail("danny@example.com");
 		authors2 = new HashSet<Author>();
 		authors2.add(author3);
 		authors2.add(author4);
-
+		authors3 = new HashSet<Author>();
+		authors3.add(author5);
+		
 		categories1 = new ArrayList<String>();
 		categories1.add("Sports");
 		categories1.add("International");
@@ -100,7 +113,7 @@ public class EntryDaoTests {
 		categories2 = new ArrayList<String>();
 		categories2.add("Sports");
 		categories2.add("Local");
-		categories2.add("Politics");
+		categories2.add("Opinion");
 		
 		contributors = new HashSet<Contributor>();
 		Contributor contributor1 = new Contributor("george");
@@ -121,8 +134,10 @@ public class EntryDaoTests {
 		feed3 = new AtomFeed("Title of feed3", "google.com/feed3", date2);
 		feed3.setAuthors(authors2);
 		feed3.setCategories(categories2);
+		
 		entries1 = new ArrayList<AtomEntry>();
-		AtomEntry entry1 = new AtomEntry("Entry Title 1", "entry1111.com/entry1", date1);
+		entries2 = new ArrayList<AtomEntry>();
+		entry1 = new AtomEntry("Entry Title 1", "entry1111.com/entry1", date1);
 		entry1.setAuthors(authors1);
 		entry1.setCategories(categories1);
 		entry1.setContributors(contributors);
@@ -133,7 +148,7 @@ public class EntryDaoTests {
 		entry1.setSource(new AtomFeed("source1 title", "source1.com/uniqueid", date1));
 		entry1.setSummary("This is the summary of entry1");
 
-		AtomEntry entry2 = new AtomEntry("Entry Title 2: The Second Coming", "entry2222.com/entry2", date2);
+		entry2 = new AtomEntry("Entry Title 2: The Second Coming", "entry2222.com/entry2", date2);
 		entry2.setAuthors(authors2);
 		entry2.setCategories(categories2);
 		entry2.setContributors(contributors);
@@ -144,10 +159,26 @@ public class EntryDaoTests {
 		entry2.setSource(new AtomFeed("source2 title", "source2.com/uniqueid", date2));
 		entry2.setSummary("This is the summary of entry2");
 
+		entry3 = new AtomEntry("Entry Title 3: The Treble Coming", "entry333.com/entry3", date2);
+		entry3.setAuthors(authors3);
+		entry3.setCategories(categories2);
+		entry3.setContributors(contributors);
+		entry3.setContent("This is the content of the third entry blah blah blah");
+		entry3.setLink("somelinksomewhere.com");
+		entry3.setRights("These are the rights!");
+		entry3.setPublished(date2);
+		entry3.setSource(new AtomFeed("source3 title", "source3.com/uniqueid", date2));
+		entry3.setSummary("This is the summary of entry3");
+
+		
 		entries1.add(entry1);
 		entries1.add(entry2);
-		feed1.setEntries(entries1);
+		entries2.add(entry3);
 		
+		feed1.setEntries(entries1);
+		feed2.setEntries(entries2);
+
+
 		// delete old data
 		jdbc = new JdbcTemplate(dataSource);
 		jdbc.execute("delete from channels");
@@ -171,38 +202,42 @@ public class EntryDaoTests {
 	@Test
 	public void testExists() {
 		jdbc.execute("delete from feeds"); // clear table
-		feedDao.createFeed(feed1);
-		assertTrue("There should be feed1 in the db", feedDao.exists(feed1));
-		feedDao.createFeed(feed2);
-		assertTrue("There should be feed2 in the db", feedDao.exists(feed2));
-		assertTrue("There should be feed1 in the db still", feedDao.exists(feed1));
+		jdbc.execute("delete from entries"); // clear table
+
+		feedDao.createFeed(feed1); // creates two entries
+		assertTrue("There should be entry1 and entry2 in the db", entryDao.exists(entry1));
+		assertTrue("There should be entry1 and entry2 in the db", entryDao.exists(entry2));
+		feedDao.createFeed(feed2); // has one entry (entry3)
+		assertTrue("There should be entry3 in the db", entryDao.exists(entry3));
+		assertTrue("There should be entry1 in the db still", entryDao.exists(entry1));
 
 	}
 
 	@Test
 	public void testgetAllEntries() {
 		jdbc.execute("delete from feeds"); // clear table
-		feedDao.createFeed(feed2);
-		Set<AtomFeed> rFeeds = feedDao.getAllFeeds();
-		assertEquals("There should be only be one feed", 1, rFeeds.size());
-		feedDao.createFeed(feed2);
-		rFeeds = feedDao.getAllFeeds();
-		assertEquals("There should be two feeds, two regular", 2, rFeeds.size());
+		jdbc.execute("delete from entries"); // clear table
+		
+		feedDao.createFeed(feed2); // one entry (entry3)
+		Set<AtomEntry> rEntries = entryDao.getAllEntries();
+		assertEquals("There should be only be one entry", 1, rEntries.size());
 		feedDao.createFeed(feed1);
-		rFeeds = feedDao.getAllFeeds();
-		assertEquals("There should be four feeds, three regular, one source", 4, rFeeds.size());
+		rEntries = entryDao.getAllEntries();
+		assertEquals("There should be three entries", 3, rEntries.size());
 
 	}
 
 	@Test
 	public void testGetEntryById() {
 		jdbc.execute("delete from feeds"); // clear table
-		AtomFeed rFeed = feedDao.getFeedById("google.com/feed2b");
-		assertEquals("There are no db entries, should be 0 matches", null, rFeed);
+		jdbc.execute("delete from entries"); // clear table
 		
-		feedDao.createFeed(feed2);
-		rFeed = feedDao.getFeedById("google.com/feed2b");
-		assertEquals("Should be feed2's id in the database", "Title of feed2", rFeed.getTitle());
+		AtomEntry rEntry = entryDao.getEntryById("entry1111.com/entry1");
+		assertEquals("There are no db entries, should be 0 matches", null, rEntry);
+		
+		feedDao.createFeed(feed1); // creates two entries (1, 2)
+		rEntry = entryDao.getEntryById("entry1111.com/entry1");
+		assertEquals("Should be entry1's id in the database", "Entry Title 1", rEntry.getTitle());
 	}
 
 	@Test
@@ -211,34 +246,32 @@ public class EntryDaoTests {
 		jdbc.execute("delete from authors"); // clear table
 		jdbc.execute("delete from entries"); // clear table
 
-		Set<AtomFeed> rFeeds = feedDao.getFeedsByAuthorName("george");
-		assertEquals("there should be no feeds cited by george", 0, rFeeds.size());
+		Set<AtomEntry> rEntries = entryDao.getEntriesByAuthorName("george");
+		assertEquals("there should be no entries cited by george", 0, rEntries.size());
 
 		feedDao.createFeed(feed1); // has author1 and author 2 (george and bill)
-		rFeeds = feedDao.getFeedsByAuthorName("george");
-		assertEquals("Should only be one feed in the list", 1, rFeeds.size());
-		rFeeds = feedDao.getFeedsByAuthorName("bill");
-		assertEquals("Should only be one feed in the list", 1, rFeeds.size());
+		rEntries = entryDao.getEntriesByAuthorName("george");
+		assertEquals("Should only be one entry in the list", 1, rEntries.size());
+		rEntries = entryDao.getEntriesByAuthorName("bill");
+		assertEquals("Should only be one feed in the list", 1, rEntries.size());
 		
-		feedDao.createFeed(feed3); // has author1 and author 2 (george and bill again)
-		rFeeds = feedDao.getFeedsByAuthorName("george");
-		assertEquals("two feeds now cite george as an author", 2, rFeeds.size());
-		
-		feedDao.createFeed(feed2); // add a new feed without authors
-		rFeeds = feedDao.getFeedsByAuthorName("bill");
-		assertEquals("two feeds cite bill as an author", 2, rFeeds.size());
+		// partial and multiple match test
+		feedDao.createFeed(feed2); // feed2 has author5 (danny) in  entry3
+		rEntries = entryDao.getEntriesByAuthorName("Dan");
+		assertEquals("Entry2 cites both dan as an author (dan and daniel), and entry3 cites danny", 2, rEntries.size());
 		
 		// should match partially too (to bill)
-		rFeeds = feedDao.getFeedsByAuthorName("il"); 
-		assertEquals("two feeds cite bill as an author", 2, rFeeds.size());
+		rEntries = entryDao.getEntriesByAuthorName("il"); 
+		assertEquals("two feeds cite bill as an author", 1, rEntries.size());
 
+		feedDao.createFeed(feed3); // has author1 and author 2  again (bill and george)
 		// another partial match test
-		rFeeds = feedDao.getFeedsByAuthorName("geo"); 
-		assertEquals("two feeds cite bill as an author", 2, rFeeds.size());
+		rEntries = entryDao.getEntriesByAuthorName("geo"); 
+		assertEquals("one entry (despite multiple inserts) cites geo as an author", 1, rEntries.size());
 
 		// a negative test
-		rFeeds = feedDao.getFeedsByAuthorName("pete"); 
-		assertEquals("no feeds cite pete as an author", 0, rFeeds.size());
+		rEntries = entryDao.getEntriesByAuthorName("pete"); 
+		assertEquals("no feeds cite pete as an author", 0, rEntries.size());
 
 	}
 
@@ -246,46 +279,45 @@ public class EntryDaoTests {
 	public void testGetEntriesByCategory() {
 		jdbc.execute("delete from feeds"); // clear table
 		jdbc.execute("delete from categories"); // clear table
+		jdbc.execute("delete from entries"); // clear table
+
+		feedDao.createFeed(feed1); // entry1 and entry2 both have three categories, but none are 'claptrap'
+		Set<AtomEntry> rEntries = entryDao.getEntriesByCategory("claptrap");
+		assertEquals("As there are no categories called claptrap", 0, rEntries.size());
 		
-		feedDao.createFeed(feed1); // feed1 has three categories, but none are claptrap
-		Set<AtomFeed> rFeed = feedDao.getFeedsByCategory("claptrap");
-		assertEquals("As there are no categories call claptrap", 0, rFeed.size());
-		
-		rFeed = feedDao.getFeedsByCategory("Sports");
-		assertEquals("Should be one field with a sports category", 1, rFeed.size());
+		// two entries have the same sports category
+		rEntries = entryDao.getEntriesByCategory("Sports");
+		assertEquals("Should be two entries with a sports category", 2, rEntries.size());
 
 		// check for case insensitive match
-		rFeed = feedDao.getFeedsByCategory("sportS");
-		assertEquals("Should be one field with a sports category", 1, rFeed.size());
-		
-		// add another feed w/categories, check for two matches
-		feedDao.createFeed(feed3); // feed3 has three categories
-		rFeed = feedDao.getFeedsByCategory("sports");
-		assertEquals("should be two feeds with Sports as a category", 2, rFeed.size());
-		
-		rFeed = feedDao.getFeedsByCategory("local");
-		assertEquals("should be one feed with Local as a category", 1, rFeed.size());
+		rEntries = entryDao.getEntriesByCategory("politICS");
+		assertEquals("Should be one field with a politics category", 1, rEntries.size());
+				
+		rEntries = entryDao.getEntriesByCategory("local");
+		assertEquals("should be one feed with Local as a category", 1, rEntries.size());
 
 	} 
 
 	@Test
 	public void testGetEntriesByTitle() {
 		jdbc.execute("delete from feeds"); // clear table
+		jdbc.execute("delete from entries"); // clear table
+		
 		feedDao.createFeed(feed1);
 
-		Set<AtomFeed> rFeed = feedDao.getFeedsByTitle("something");
-		assertEquals("Should be feed1 with that word in it's title", 0, rFeed.size());
+		// no match test, 'something' doesn't exist in any entry title
+		Set<AtomEntry> rEntries = entryDao.getEntriesByTitle("something");
+		assertEquals("There should be no entries with 'something' in its title", 0, rEntries.size());
 
-		rFeed = feedDao.getFeedsByTitle("title");
-		assertEquals("Should be feed1 and its entry's source with 'title' in its title", 2, rFeed.size());
+		rEntries = entryDao.getEntriesByTitle("title");
+		assertEquals("Both entries 1 and 2 should have the word title in their title", 2, rEntries.size());
 		
-		rFeed = feedDao.getFeedsByTitle("feed1");
-		assertEquals("Should be feed1 with 'feed1' in its title", 1, rFeed.size());
+		rEntries = entryDao.getEntriesByTitle("Title 1");
+		assertEquals("Should be entry1 with 'Title 1' in its title", 1, rEntries.size());
 		feedDao.createFeed(feed2);
-		feedDao.createFeed(feed3);
 		
-		rFeed = feedDao.getFeedsByTitle("title");
-		assertEquals("Should be all three feeds and a source with 'title' in their titles", 4, rFeed.size());
+		rEntries = entryDao.getEntriesByTitle("title");
+		assertEquals("Should be all three entries with 'title' in their titles", 3, rEntries.size());
 
 
 	}

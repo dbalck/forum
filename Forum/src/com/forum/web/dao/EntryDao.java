@@ -11,10 +11,13 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.forum.web.atom.AtomEntry;
 
-
+@Transactional
+@Component("entryDao")
 public class EntryDao {
 	
 	@Autowired
@@ -27,9 +30,12 @@ public class EntryDao {
 	public EntryDao() {
 		System.out.println("entryDao is live");
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	public Set<AtomEntry> getAllEntries() {
-		return null;
+		Query query = session().createQuery("from AtomEntry");
+		Set<AtomEntry> result =  new HashSet<AtomEntry>(query.list());
+		return result;
 	}
 		
 	// queries based on global id; uses getEntryById for the heavy lifting
