@@ -33,22 +33,22 @@ public class FeedDao {
 
 	// creates and inserts the Feed objects into the database via hibernate
 	public void createFeed(AtomFeed feed) {
-		session().save(feed);
+		if (!exists(feed)) {
+			session().save(feed);
+		}
 	}
 	
 	// queries based on global id; uses getFeedById for the heavy lifting
 	public boolean exists(AtomFeed feed) {
-		String id = feed.getGlobalId();
-		AtomFeed ret = getFeedById(id);
+		String id = feed.getId();
+		AtomFeed ret = (AtomFeed) session().get(AtomFeed.class, id);
 		return ret != null ? true : false;
 	}
 	
 	// gets the feed based on the feed's global identifier
 	// returns null if it doesn't exist
-	public AtomFeed getFeedById(String globalId) {
-		Criteria crit = session().createCriteria(AtomFeed.class);
-		crit.add(Restrictions.eq("globalId", globalId));
-		return (AtomFeed) crit.uniqueResult();
+	public AtomFeed getFeedById(String id) {
+		return (AtomFeed) session().get(AtomFeed.class, id);
 	}
 	
 	@SuppressWarnings("unchecked")

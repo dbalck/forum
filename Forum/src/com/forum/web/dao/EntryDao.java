@@ -38,19 +38,18 @@ public class EntryDao {
 		return result;
 	}
 		
-	// queries based on global id; uses getEntryById for the heavy lifting
+	// queries based on id (a md5 UUID hash of the globalId)
 	public boolean exists(AtomEntry entry) {
-		String id = entry.getGlobalId();
-		AtomEntry ret = getEntryById(id);
+		String id = entry.getId();
+		AtomEntry ret = (AtomEntry) session().get(AtomEntry.class, id);
 		return ret != null ? true : false;
 	}
 	
-	// gets the Entry based on the entry's global identifier
+	// gets the Entry based on the entry's UUID (id field)
 	// returns null if it doesn't exist
-	public AtomEntry getEntryById(String globalId) {
-		Criteria crit = session().createCriteria(AtomEntry.class);
-		crit.add(Restrictions.eq("globalId", globalId));
-		return (AtomEntry) crit.uniqueResult();
+	public AtomEntry getEntryById(String id) {
+		AtomEntry entry = (AtomEntry) session().get(AtomEntry.class, id);
+		return entry;
 	}
 	
 	@SuppressWarnings("unchecked")
