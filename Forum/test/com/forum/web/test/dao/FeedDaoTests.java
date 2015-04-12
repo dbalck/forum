@@ -171,12 +171,13 @@ public class FeedDaoTests {
 		feedDao.createFeed(feed2);
 		feeds = feedDao.getAllFeeds();
 		assertEquals("There should three feeds in the db -- two regular and one source", 3, feeds.size());
-		
-		AtomFeed rFeed2 = feedDao.getFeedById("google.com/feed2b");
+		String feedId = feed2.getId();
+		AtomFeed rFeed2 = feedDao.getFeedById(feedId);
 		assertEquals("The returned feed should have the correct title", "Title of feed2", rFeed2.getTitle());
 		// feed2 should have all it's initialized fields
 		
-		AtomFeed rFeed1 = feedDao.getFeedById("yahoo.com/feed1a");
+		feedId = feed1.getId();
+		AtomFeed rFeed1 = feedDao.getFeedById(feedId);
 		assertEquals("feed1 should have date1", date1, rFeed1.getUpdated());
 		assertEquals("feed1 should have title1", "Title of feed1", rFeed1.getTitle());
 
@@ -197,15 +198,25 @@ public class FeedDaoTests {
 	@Test
 	public void testgetAllFeeds() {
 		jdbc.execute("delete from feeds"); // clear table
-		feedDao.createFeed(feed2);
+		
+		// check for empty set
 		Set<AtomFeed> rFeeds = feedDao.getAllFeeds();
-		assertEquals("There should be only be one feed", 1, rFeeds.size());
+		assertEquals("There should be no feeds", 0, rFeeds.size());
+
+		// check for single feed existence
 		feedDao.createFeed(feed2);
 		rFeeds = feedDao.getAllFeeds();
-		assertEquals("There should be two feeds, two regular", 2, rFeeds.size());
+		assertEquals("There should be only be one feed", 1, rFeeds.size());
+		
+		// check for two feeds
 		feedDao.createFeed(feed1);
 		rFeeds = feedDao.getAllFeeds();
-		assertEquals("There should be four feeds, three regular, one source", 4, rFeeds.size());
+		assertEquals("There should be three feeds, two regular, one source", 3, rFeeds.size());
+		
+		// check that duplicate object is not persisted
+		feedDao.createFeed(feed1);
+		rFeeds = feedDao.getAllFeeds();
+		assertEquals("There should be three feeds, two regular, one source", 3, rFeeds.size());
 
 	}
 
@@ -216,7 +227,8 @@ public class FeedDaoTests {
 		assertEquals("There are no db entries, should be 0 matches", null, rFeed);
 		
 		feedDao.createFeed(feed2);
-		rFeed = feedDao.getFeedById("google.com/feed2b");
+		String feedId = feed2.getId();
+		rFeed = feedDao.getFeedById(feedId);
 		assertEquals("Should be feed2's id in the database", "Title of feed2", rFeed.getTitle());
 	}
 

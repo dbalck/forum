@@ -218,12 +218,24 @@ public class EntryDaoTests {
 		jdbc.execute("delete from feeds"); // clear table
 		jdbc.execute("delete from entries"); // clear table
 		
-		feedDao.createFeed(feed2); // one entry (entry3)
+		// check empty set
 		Set<AtomEntry> rEntries = entryDao.getAllEntries();
+		assertEquals("There should be no entries yet", 0, rEntries.size());
+		
+		// check for one insert
+		feedDao.createFeed(feed2); // one entry (entry3)
+		rEntries = entryDao.getAllEntries();
 		assertEquals("There should be only be one entry", 1, rEntries.size());
+		
+		// check for two more inserts
 		feedDao.createFeed(feed1);
 		rEntries = entryDao.getAllEntries();
 		assertEquals("There should be three entries", 3, rEntries.size());
+		
+		// check for duplicate insert
+		feedDao.createFeed(feed2);
+		rEntries = entryDao.getAllEntries();
+		assertEquals("There should still be three entries", 3, rEntries.size());
 
 	}
 
@@ -232,12 +244,20 @@ public class EntryDaoTests {
 		jdbc.execute("delete from feeds"); // clear table
 		jdbc.execute("delete from entries"); // clear table
 		
-		AtomEntry rEntry = entryDao.getEntryById("entry1111.com/entry1");
+		AtomEntry rEntry = entryDao.getEntryById(entry1.getId());
 		assertEquals("There are no db entries, should be 0 matches", null, rEntry);
 		
 		feedDao.createFeed(feed1); // creates two entries (1, 2)
-		rEntry = entryDao.getEntryById("entry1111.com/entry1");
+		
+		// there should be entry1 in there (it was part of feed1)
+		String entryId = entry1.getId();
+		rEntry = entryDao.getEntryById(entryId);
 		assertEquals("Should be entry1's id in the database", "Entry Title 1", rEntry.getTitle());
+		
+		// there should also be entry2 in there (it was part of feed1)
+		entryId = entry2.getId();
+		rEntry = entryDao.getEntryById(entryId);
+		assertEquals("Should be entry2's id in the database", "Entry Title 2: The Second Coming", rEntry.getTitle());
 	}
 
 	@Test
