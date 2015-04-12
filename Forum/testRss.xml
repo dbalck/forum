@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Channel1</title>
+  <link>http://www.w3schools.com</link>
+  <description>This is the channel description.</description>
+  <item>
+    <title>Title1</title>
+    <link>http://www.w3schools.com/rss</link>
+    <description>New RSS tutorial on W3Schools</description>
+  </item>
+  <item>
+    <title>Title2</title>
+    <link>http://www.w3schools.com/xml</link>
+    <description>New XML tutorial on W3Schools</description>
+  </item>
+</channel>
+
+</rss>
