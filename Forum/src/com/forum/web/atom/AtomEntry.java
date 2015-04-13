@@ -12,6 +12,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -51,6 +52,9 @@ public class AtomEntry implements Article {
 	@Column(name="category")	
 	private List<String> categories;
 	
+	@ManyToOne
+	@JoinColumn(name="feed_id")
+	private AtomFeed feed;
 	
 	private long published;
 	
@@ -202,6 +206,14 @@ public class AtomEntry implements Article {
 		return this.title;
 	}
 	
+	public AtomFeed getFeed() {
+		return feed;
+	}
+
+	public void setFeed(AtomFeed feed) {
+		this.feed = feed;
+	}
+
 	public int getHash() {
 		return hash;
 	}

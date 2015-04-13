@@ -229,6 +229,10 @@ public class AtomFeed implements Stream {
 	public void setHash(int hash) {
 		this.hash = hash;
 	}
+	
+	public void addEntries(Set<AtomEntry> entries) {
+		this.entries.addAll(entries);
+	}
 
 	private String generateId(String id) {
 		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());

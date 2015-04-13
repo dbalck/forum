@@ -319,10 +319,7 @@ public class EntryDaoTests {
 	} 
 
 	@Test
-	public void testGetEntriesByTitle() {
-		jdbc.execute("delete from feeds"); // clear table
-		jdbc.execute("delete from entries"); // clear table
-		
+	public void testGetEntriesByTitle() {		
 		feedDao.createFeed(feed1);
 
 		// no match test, 'something' doesn't exist in any entry title
@@ -339,6 +336,26 @@ public class EntryDaoTests {
 		rEntries = entryDao.getEntriesByTitle("title");
 		assertEquals("Should be all three entries with 'title' in their titles", 3, rEntries.size());
 
+
+	}
+	
+	@Test
+	public void testAddEntriesToFeed() {		
+		feedDao.createFeed(feed1);
+		Set<AtomEntry> rEntries = entryDao.getAllEntries();
+		assertEquals("Should have only two entries", 2, rEntries.size());
+		
+
+	}
+
+	@Test
+	public void testGetEntriesFromFeed() {		
+		feedDao.createFeed(feed1);
+		Set<AtomEntry> rEntries = entryDao.getAllEntries();
+		assertEquals("Should have only two entries", 2, rEntries.size());
+		
+		rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Should have retrieved two entries", 2, rEntries.size());
 
 	}
 

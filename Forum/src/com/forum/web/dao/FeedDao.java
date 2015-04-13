@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.forum.web.atom.AtomEntry;
 import com.forum.web.atom.AtomFeed;
 
 @Transactional
@@ -91,10 +92,7 @@ public class FeedDao {
 		Set<AtomFeed> result =  new LinkedHashSet<AtomFeed>(query.list());
 		return result;
 
-	}
-	
-	
-	
+	}	
 
 	
 }

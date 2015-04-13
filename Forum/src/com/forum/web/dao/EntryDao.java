@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.forum.web.atom.AtomEntry;
+import com.forum.web.atom.AtomFeed;
 
 @Transactional
 @Component("entryDao")
@@ -81,6 +82,21 @@ public class EntryDao {
 	public Set<AtomEntry> getEntriesByAuthorEmail(String email) {
 		Criteria crit = session().createCriteria(AtomEntry.class);
 		crit.createCriteria("authors").add(Restrictions.ilike("email", email, MatchMode.EXACT));
+		Set<AtomEntry> result =  new LinkedHashSet<AtomEntry>(crit.list());
+		return result;
+	}
+	
+	public void addEntiresToFeed(Set<AtomEntry> entries, AtomFeed feed) {
+		feed.addEntries(entries);
+		session().saveOrUpdate(feed);
+		session().flush();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Set<AtomEntry> getEntriesFromFeed(AtomFeed feed) {
+		Criteria crit = session().createCriteria(AtomEntry.class);
+		crit.createCriteria("feed", "f");
+		crit.add(Restrictions.eq("f.id", feed.getId()));
 		Set<AtomEntry> result =  new LinkedHashSet<AtomEntry>(crit.list());
 		return result;
 	}
