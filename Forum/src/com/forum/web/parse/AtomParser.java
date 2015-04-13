@@ -40,7 +40,7 @@ public class AtomParser extends Parser {
 		AtomFeed feed = null;
 
 		// represents the items that will be included in this channel
-		List<AtomEntry> feedEntries = new ArrayList<AtomEntry>();
+		Set<AtomEntry> feedEntries = new HashSet<AtomEntry>();
 
 		// a stack to represent the dom
 		Stack<HashMap<String, Object>> dom = new Stack<HashMap<String, Object>>();

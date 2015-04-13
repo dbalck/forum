@@ -60,7 +60,7 @@ public class AtomFeed implements Stream {
 	
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name="feed_id")
-	private List<AtomEntry> entries;
+	private Set<AtomEntry> entries;
 	
 	// id for persistence/hibernate
 	@Id
@@ -173,11 +173,11 @@ public class AtomFeed implements Stream {
 		this.subtitle = subtitle;
 	}
 
-	public List<AtomEntry> getEntries() {
+	public Set<AtomEntry> getEntries() {
 		return entries;
 	}
 
-	public void setEntries(List<AtomEntry> entries) {
+	public void setEntries(Set<AtomEntry> entries) {
 		this.entries = entries;
 	}
 
