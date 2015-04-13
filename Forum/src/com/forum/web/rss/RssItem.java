@@ -2,12 +2,12 @@ package com.forum.web.rss;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -47,9 +47,9 @@ public class RssItem implements Article {
 	private RssChannel channel;
 		
 	@Id
-	@GeneratedValue
 	@Column(name="item_id")
-	private int id;
+	private String id;
+	private int hash;
 	
 	public RssItem() {}
 	
@@ -57,6 +57,14 @@ public class RssItem implements Article {
 		this.title = title;
 		this.description = description;
 		this.link = link;
+		String id = "";
+		if (title != null) {
+			id += title;
+		}
+		if (link != null) {
+			id += link;
+		}
+		this.id = generateId(id);
 	}
 	
 
@@ -98,14 +106,6 @@ public class RssItem implements Article {
 
 	public void setLink(String link) {
 		this.link = link;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public long getPubDate() {
@@ -179,6 +179,50 @@ public class RssItem implements Article {
 		return getTitle();
 	}
 	
+	public int getHash() {
+		return hash;
+	}
+
+	public void setHash(int hash) {
+		this.hash = hash;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	private String generateId(String id) {
+		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());
+		return uuid.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		if (this.hash == 0) {
+			final int prime = 31;
+			int result = 1;
+			this.hash = prime * result + hash;
+		}
+		return this.hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RssItem other = (RssItem) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		return "RssItem [title=" + title + ", description=" + description

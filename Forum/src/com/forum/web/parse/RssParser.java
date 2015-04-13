@@ -380,7 +380,9 @@ public class RssParser extends Parser {
 							}
 							
 							if (top.containsKey("textInput")) {
-								channel.setTextInput((TextInput) top.get("textInput"));
+								TextInput ti = (TextInput) top.get("textInput");
+								ti.setId(channel.getId());
+								channel.setTextInput(ti);
 							}
 
 							if (top.containsKey("ttl")) {

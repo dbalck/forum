@@ -1,15 +1,20 @@
 package com.forum.web.dao;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.forum.web.rss.RssChannel;
-import com.forum.web.rss.RssItem;
 
 @Transactional
 @Component("channelDao")
@@ -27,38 +32,58 @@ public class ChannelDao {
 		return sessionFactory.getCurrentSession();
 	}
 	
-	@Transactional
 	@SuppressWarnings("unchecked")
-	public List<RssChannel> getAllChannels() {
-		return session().createQuery("from RssChannel").list();
+	public Set<RssChannel> getAllChannels() {
+		Query query = session().createQuery("from RssChannel");
+		Set<RssChannel> result = new HashSet<RssChannel>(query.list());
+		return result;
 	}
 	
-	@Transactional
 	public void createChannel(RssChannel channel) {
 		session().save(channel);
 	}
 	
-	public RssChannel getChannel(int channelId) {
-		return (RssChannel) session().load(RssChannel.class, channelId);
+	public RssChannel getChannelById(String id) {
+		return (RssChannel) session().get(RssChannel.class, id);
+	}
+			
+	// queries based on title and link;
+	public boolean exists(RssChannel channel) {
+		String id = channel.getId();
+		RssChannel ret = (RssChannel) session().get(RssChannel.class, id);
+		return ret != null ? true : false;
+	}
+	
+	// Returns all the channels whose title strings at lease partially match (case insensitive) the argument string
+	@SuppressWarnings("unchecked")
+	public Set<RssChannel> getChannelsByTitle(String title) {
+		Criteria crit = session().createCriteria(RssChannel.class);
+		crit.add(Restrictions.ilike("title", title, MatchMode.ANYWHERE));
+		Set<RssChannel> result =  new HashSet<RssChannel>(crit.list());
+		return result;
+
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<RssItem> getItems(RssChannel channel) {
-		return session()
-				.createQuery("from RssItem as item where item.channel = ?")
-				.setInteger(0, channel.getId())
-				.list();
+	public Set<RssChannel> getChannelsByCategory(String category) {
+		Criteria crit = session().createCriteria(RssChannel.class);
+		crit.add(Restrictions.ilike("category", category));
+		Set<RssChannel> result =  new HashSet<RssChannel>(crit.list());
+		return result;
+		
 	}
-	
-	public RssChannel getChannelByTitle(String title) {
-		return (RssChannel) session()
-				.createQuery("from RssChannel as channel where channel.title = ?")
-				.setString(0, title)
-				.uniqueResult();
+
+	@SuppressWarnings("unchecked")
+	public Set<RssChannel> getFeedsByPersonName(String name) {
+		Criteria crit = session().createCriteria(RssChannel.class);
+		crit.add(Restrictions.or(
+				Restrictions.ilike("managingEditor", name, MatchMode.ANYWHERE), 
+				Restrictions.ilike("webMaster", name, MatchMode.ANYWHERE) 
+				));
+		Set<RssChannel> result =  new LinkedHashSet<RssChannel>(crit.list());
+		
+		return result;
 	}
-	
-	public boolean exists(RssChannel channel) {
-		return false;
-	}
+
 	
 }

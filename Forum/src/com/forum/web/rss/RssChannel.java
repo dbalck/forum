@@ -3,12 +3,11 @@ package com.forum.web.rss;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -39,23 +38,23 @@ public class RssChannel implements Stream {
 	
 	// private List<Integer> skipHours;
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="channel_id")
 	private SkipDays skipDays;
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="channel_id")
 	private Image image;
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="channel_id")
 	private TextInput textInput;
 
 	// id for persistence/hibernate
 	@Id
 	@Column(name="channel_id")
-	@GeneratedValue
-	private int id;
+	private String id;
+	private int hash;
 	
 	private long pubDate;
 	private long lastBuildDate;
@@ -76,6 +75,7 @@ public class RssChannel implements Stream {
 		this.title = title;
 		this.link = link;
 		this.description = description;
+		this.id = generateId(title + link);
 	}
 	
 	public String getTitle() {
@@ -142,11 +142,11 @@ public class RssChannel implements Stream {
 		this.textInput = textInput;
 	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -276,6 +276,50 @@ public class RssChannel implements Stream {
 	
 	public StreamType type() {
 		return StreamType.RSS;
+	}
+	
+	private String generateId(String id) {
+		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());
+		return uuid.toString();
+	}
+
+	public int getHash() {
+		return hash;
+	}
+
+	public void setHash(int hash) {
+		this.hash = hash;
+	}
+
+	public void setTtl(int ttl) {
+		this.ttl = ttl;
+	}
+
+	@Override
+	public int hashCode() {
+		if (this.hash == 0) {
+			final int prime = 31;
+			int result = 1;
+			this.hash = prime * result + ((id == null) ? 0 : id.hashCode());
+		}
+		return this.hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RssChannel other = (RssChannel) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 	@Override

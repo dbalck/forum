@@ -9,7 +9,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.hibernate.Hibernate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +32,8 @@ import com.forum.web.rss.TextInput;
 		"classpath:com/forum/web/config/dao-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ChannelDaoTests {
+	
+	private JdbcTemplate jdbc;
 	private Enclosure enclosure1;
 	private RssItem item1;
 	private RssItem item2;
@@ -50,7 +51,7 @@ public class ChannelDaoTests {
 	
 	@Before
 	public void initializeDB() {
-		JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+		jdbc = new JdbcTemplate(dataSource);
 		jdbc.execute("delete from channels");
 		jdbc.execute("delete from images");
 		jdbc.execute("delete from items");
@@ -80,25 +81,27 @@ public class ChannelDaoTests {
 		sd1 = new SkipDays(days);
 		
 		channel1 = new RssChannel("Channel Title1", "example1.com", "This is the first channel");
-
-	}
-	
-	@Test
-	public void testCreateChannel() {
 		channel1.setItems(items);
 		channel1.setImage(image1);
 		channel1.setTextInput(ti1);
 		channel1.setSkipDays(sd1);
 
-		channelDao.createChannel(channel1);
-		
-		RssChannel channel = channelDao.getAllChannels().get(0);
-		String title = channel.getTitle();
-		assertEquals("Titles should be the same", "Channel Title1", title);	
-		
-		List<RssItem> items = channelDao.getItems(channel);
-		assertEquals("There should be two items", 2, items.size());
 
+	}
+	
+	@Test
+	public void testCreateChannel() {
+		jdbc.execute("delete from channels");		
+		
+		// empty set (no channels created)
+		Set<RssChannel> channels = channelDao.getAllChannels();
+		assertEquals("There should no channels created", 0, channels.size());	
+
+		// one channel created
+		channelDao.createChannel(channel1);
+		channels = channelDao.getAllChannels();
+		assertEquals("There should only be one channel", 1, channels.size());	
+		
 	}
 	
 

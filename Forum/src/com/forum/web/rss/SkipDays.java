@@ -1,10 +1,10 @@
 package com.forum.web.rss;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -14,8 +14,8 @@ public class SkipDays {
 
 	@Id
 	@Column(name="skipdays_id")
-	@GeneratedValue
-	private int id;
+	private String id;
+	private int hash;
 	
 	private boolean monday;
 	private boolean tuesday;
@@ -28,6 +28,7 @@ public class SkipDays {
 	public SkipDays() {}
 	
 	public SkipDays(List<String> days) {
+		this.id = UUID.randomUUID().toString();
 		for (String str: days) {
 			switch (str) {
 			case "monday":
@@ -53,14 +54,6 @@ public class SkipDays {
 				break;
 			}
 		}
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public boolean isMonday() {
@@ -118,7 +111,50 @@ public class SkipDays {
 	public void setSunday(boolean sunday) {
 		this.sunday = sunday;
 	}
+
+	public int getHash() {
+		return hash;
+	}
+
+	public void setHash(int hash) {
+		this.hash = hash;
+	}
 	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	@Override
+	public int hashCode() {
+		if (this.hash == 0) {
+			final int prime = 31;
+			int result = 1;
+			this.hash = prime * result + ((id == null) ? 0 : id.hashCode());
+		}
+		return this.hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SkipDays other = (SkipDays) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
 	
 
 	

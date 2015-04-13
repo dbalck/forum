@@ -1,8 +1,9 @@
 package com.forum.web.rss;
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -15,8 +16,8 @@ public class Enclosure {
 	
 	@Id
 	@Column(name="enclosure_id")
-	@GeneratedValue
-	private int id;
+	private String id;
+	private int hash;
 	
 	public Enclosure() {}
 	
@@ -24,12 +25,10 @@ public class Enclosure {
 		this.length = length;
 		this.type = type;
 		this.url = url;
+		this.id = generateId(type + url);
+
 	}
-	
-	public void setId(int id) {
-		this.id = id;
-	}
-	
+		
 	public void setLength(int length) {
 		this.length = length;
 	}
@@ -42,13 +41,6 @@ public class Enclosure {
 		this.url = url;
 	}
 	
-	public int getId() {
-		return id;
-	}
-
-	public int getLength() {
-		return length;
-	}
 
 	public String getType() {
 		return type;
@@ -57,6 +49,55 @@ public class Enclosure {
 	public String getUrl() {
 		return url;
 	}
+	
+	public int getHash() {
+		return hash;
+	}
+
+	public void setHash(int hash) {
+		this.hash = hash;
+	}
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	private String generateId(String id) {
+		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());
+		return uuid.toString();
+	}
+	
+	@Override
+	public int hashCode() {
+		if (this.hash == 0) {
+			final int prime = 31;
+			int result = 1;
+			this.hash = prime * result + ((id == null) ? 0 : id.hashCode());
+		}
+		return this.hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Enclosure other = (Enclosure) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
 
 	@Override
 	public String toString() {
