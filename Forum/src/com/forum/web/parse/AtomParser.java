@@ -253,7 +253,7 @@ public class AtomParser extends Parser {
 							// if the feed map has an author key, it should
 							// point to an ArrayList of author names (Strings)
 							if (top.containsKey("authors")) {
-								feed.setAuthors((Set<Author>) top.get("authors"));
+								feed.addAuthors((Set<Author>) top.get("authors"));
 							}
 							
 							if (top.containsKey("contributors")) {
@@ -287,7 +287,7 @@ public class AtomParser extends Parser {
 								feed.setSubtitle((String) top.get("subtitle"));
 							}
 							
-							feed.setEntries(feedEntries);
+							feed.addEntries(feedEntries);
 
 						}
 						// top = null;

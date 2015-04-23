@@ -42,7 +42,7 @@ public class FeedDaoTests {
 	private AtomFeed feed1;
 	private AtomFeed feed2;
 	private AtomFeed feed3;
-	private List<AtomEntry> entries;
+	private Set<AtomEntry> entries;
 	private long date1;
 	private long date2;
 	private Author author1;
@@ -113,16 +113,16 @@ public class FeedDaoTests {
 		
 		
 		feed1 = new AtomFeed("Title of feed1", "yahoo.com/feed1a", date1);
-		feed1.setAuthors(authors1);
+		feed1.addAuthors(authors1);
 		feed1.setCategories(categories1);
 		feed1.setContributors(contributors);
 		feed2 = new AtomFeed("Title of feed2", "google.com/feed2b", date2);
 		feed3 = new AtomFeed("Title of feed3", "google.com/feed3", date2);
-		feed3.setAuthors(authors2);
+		feed3.addAuthors(authors2);
 		feed3.setCategories(categories2);
-		entries = new ArrayList<AtomEntry>();
+		entries = new HashSet<AtomEntry>();
 		AtomEntry entry1 = new AtomEntry("Entry Title 1", "entry1111.com/entry1", date1);
-		entry1.setAuthors(authors1);
+		entry1.addAuthors(authors1);
 		entry1.setCategories(categories1);
 		entry1.setContributors(contributors);
 		entry1.setContent("This is the content blah blah blah");
@@ -134,7 +134,7 @@ public class FeedDaoTests {
 		
 		entries.add(entry1);
 		entries.add(new AtomEntry("Entry Title 2", "entry2222.com/entry2", date2));
-		feed1.setEntries(entries);
+		feed1.addEntries(entries);
 		
 		// delete old data
 		jdbc = new JdbcTemplate(dataSource);
@@ -234,10 +234,6 @@ public class FeedDaoTests {
 
 	@Test
 	public void testGetFeedsByAuthorName() {
-		jdbc.execute("delete from feeds"); // clear table
-		jdbc.execute("delete from authors"); // clear table
-		jdbc.execute("delete from entries"); // clear table
-
 		Set<AtomFeed> rFeeds = feedDao.getFeedsByAuthorName("george");
 		assertEquals("there should be no feeds cited by george", 0, rFeeds.size());
 

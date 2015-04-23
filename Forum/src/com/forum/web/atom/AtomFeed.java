@@ -1,17 +1,20 @@
 package com.forum.web.atom;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -35,9 +38,11 @@ public class AtomFeed implements Stream {
 	private long updated;
 	
 	// recommended fields
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name="feed_id")
-	private Set<Author> authors;
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name="feeds_authors", 
+		joinColumns = { @JoinColumn(name = "feed_id")}, 
+		inverseJoinColumns= { @JoinColumn(name = "author_id")})
+	private Set<Author> authors = new HashSet<Author>();
 	
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name="feed_id")
@@ -58,14 +63,15 @@ public class AtomFeed implements Stream {
 	private String rights;
 	private String subtitle;
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name="feed_id")
-	private Set<AtomEntry> entries;
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "feed")
+	private Set<AtomEntry> entries = new HashSet<AtomEntry>();
 	
 	// id for persistence/hibernate
 	@Id
 	@Column(name="feed_id")
+	@GeneratedValue
 	private String id;
+	
 	private int hash;
 		
 	public AtomFeed() {}
@@ -74,7 +80,6 @@ public class AtomFeed implements Stream {
 		this.title = title;
 		this.globalId = globalId;
 		this.updated = updated;
-		this.id = generateId(globalId);
 	}
 	
 	public String getTitle() {
@@ -105,7 +110,8 @@ public class AtomFeed implements Stream {
 		return authors;
 	}
 
-	public void setAuthors(Set<Author> authors) {
+	@SuppressWarnings("unused")
+	private void setAuthors(Set<Author> authors) {
 		this.authors = authors;
 	}
 
@@ -230,13 +236,31 @@ public class AtomFeed implements Stream {
 		this.hash = hash;
 	}
 	
-	public void addEntries(Set<AtomEntry> entries) {
-		this.entries.addAll(entries);
+	public void addEntry(AtomEntry entry) {
+		entry.setFeed(this);
+		getEntries().add(entry);
 	}
-
-	private String generateId(String id) {
-		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());
-		return uuid.toString();
+	
+	public void addEntries(Set<AtomEntry> entries) {
+		if (entries != null) {
+			for (AtomEntry e: entries) {
+				addEntry(e);
+			}			
+		}
+	}
+	
+	public void removeEntry(AtomEntry entry) {
+		getEntries().remove(entry);
+		entry.setFeed(null);
+	}
+	
+	public void addAuthors(Set<Author> authors) {
+		if (authors != null) {
+			for (Author a: authors) {
+				a.addFeed(this);
+			}
+			this.authors.addAll(authors);
+		}
 	}
 	
 	@Override
@@ -244,7 +268,7 @@ public class AtomFeed implements Stream {
 		if (this.hash == 0) {
 			final int prime = 31;
 			int result = 1;
-			this.hash = prime * result + ((id == null) ? 0 : id.hashCode());
+			this.hash = prime * result + ((globalId == null) ? 0 : globalId.hashCode());
 		}
 		return this.hash;
 	}
@@ -261,7 +285,7 @@ public class AtomFeed implements Stream {
 		if (id == null) {
 			if (other.id != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!globalId.equals(other.getGlobalId()))
 			return false;
 		return true;
 	}

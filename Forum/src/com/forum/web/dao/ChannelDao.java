@@ -32,6 +32,12 @@ public class ChannelDao {
 		return sessionFactory.getCurrentSession();
 	}
 	
+	public void createChannel(RssChannel channel) {
+		if (!exists(channel)) {
+			session().save(channel);
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public Set<RssChannel> getAllChannels() {
 		Query query = session().createQuery("from RssChannel");
@@ -39,9 +45,6 @@ public class ChannelDao {
 		return result;
 	}
 	
-	public void createChannel(RssChannel channel) {
-		session().save(channel);
-	}
 	
 	public RssChannel getChannelById(String id) {
 		return (RssChannel) session().get(RssChannel.class, id);
@@ -83,6 +86,10 @@ public class ChannelDao {
 		Set<RssChannel> result =  new LinkedHashSet<RssChannel>(crit.list());
 		
 		return result;
+	}
+	
+	public void deleteChannel(RssChannel channel) {
+		session().delete(channel);
 	}
 
 	

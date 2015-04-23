@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.forum.web.atom.AtomEntry;
 import com.forum.web.atom.AtomFeed;
 
 @Transactional
@@ -41,8 +40,10 @@ public class FeedDao {
 	
 	// queries based on global id; uses getFeedById for the heavy lifting
 	public boolean exists(AtomFeed feed) {
-		String id = feed.getId();
-		AtomFeed ret = (AtomFeed) session().get(AtomFeed.class, id);
+		String id = feed.getGlobalId();
+		Criteria crit = session().createCriteria(AtomFeed.class);
+		crit.add(Restrictions.eq("globalId", id));
+		AtomFeed ret = (AtomFeed) crit.uniqueResult();
 		return ret != null ? true : false;
 	}
 	

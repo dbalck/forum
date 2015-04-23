@@ -37,11 +37,15 @@ public class ChannelDaoTests {
 	private Enclosure enclosure1;
 	private RssItem item1;
 	private RssItem item2;
+	private RssItem item3;
+	private RssItem item4;
 	private Image image1;
 	private TextInput ti1;
 	private SkipDays sd1;
 	private RssChannel channel1;
-	private Set<RssItem> items;
+	private RssChannel channel2;
+	private Set<RssItem> items1;
+	private Set<RssItem> items2;
 	
 	@Autowired
 	private ChannelDao channelDao;
@@ -62,14 +66,19 @@ public class ChannelDaoTests {
 		
 		item1 = new RssItem("title1", "example1.com", "this is the first item");
 		enclosure1 = new Enclosure(888, "this is the enclosure type", "enclosureurl.com");
-		
 		item1.setEnclosure(enclosure1);
 		
 		item2 = new RssItem("title2", "example2.com", "this is the second item");
 		
-		items = new HashSet<RssItem>();
-		items.add(item1);
-		items.add(item2);
+		items1 = new HashSet<RssItem>();
+		items1.add(item1);
+		items1.add(item2);
+		
+		item3 = new RssItem("ninjas attack the white house", "example3.com", "The identity of the culprits is still unknown");
+		item4 = new RssItem("Senator admits to love affair with staffer", "example4.com", "Constituents report that they are unsurprised");
+		items2 = new HashSet<RssItem>();
+		items2.add(item3);
+		items2.add(item4);
 		
 		image1 = new Image("Title for image", "imagelink.com", "imageurl.com");
 		
@@ -80,19 +89,21 @@ public class ChannelDaoTests {
 		days.add("tuesday");
 		sd1 = new SkipDays(days);
 		
-		channel1 = new RssChannel("Channel Title1", "example1.com", "This is the first channel");
-		channel1.setItems(items);
+		channel1 = new RssChannel("Anti-Tank - R - US", "example1.com", "Your most reliable source for Anti-tank-weapon-news");
+		channel1.setItems(items1);
 		channel1.setImage(image1);
 		channel1.setTextInput(ti1);
 		channel1.setSkipDays(sd1);
-
-
+		
+		channel2 = new RssChannel("All puppies, all the time", "example1.com", "This is the first channel");
+		channel2.setItems(items2);
+		channel2.setImage(image1);
+		channel2.setTextInput(ti1);
+		channel2.setSkipDays(sd1);
 	}
 	
 	@Test
-	public void testCreateChannel() {
-		jdbc.execute("delete from channels");		
-		
+	public void testCreateChannel() {		
 		// empty set (no channels created)
 		Set<RssChannel> channels = channelDao.getAllChannels();
 		assertEquals("There should no channels created", 0, channels.size());	
@@ -100,9 +111,31 @@ public class ChannelDaoTests {
 		// one channel created
 		channelDao.createChannel(channel1);
 		channels = channelDao.getAllChannels();
-		assertEquals("There should only be one channel", 1, channels.size());	
+		assertEquals("There should only be one channel", 1, channels.size());
+		
+		// duplicate channel should not be created
+		channelDao.createChannel(channel1);
+		channels = channelDao.getAllChannels();
+		assertEquals("There should still be only be one channel (no duplicate)", 1, channels.size());	
+
+		channelDao.createChannel(channel2);
+		channels = channelDao.getAllChannels();
+		assertEquals("There should now be two channels", 2, channels.size());	
+
+	}
+	
+	@Test
+	public void testGetAllChannels() {
+
 		
 	}
+	
+	@Test
+	public void testGetChannelsByTitle() {
+
+		
+	}
+
 	
 
 

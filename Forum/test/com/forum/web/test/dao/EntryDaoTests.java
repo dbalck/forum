@@ -43,8 +43,8 @@ public class EntryDaoTests {
 	private AtomFeed feed1;
 	private AtomFeed feed2;
 	private AtomFeed feed3;
-	private List<AtomEntry> entries1;
-	private List<AtomEntry> entries2;
+	private Set<AtomEntry> entries1;
+	private Set<AtomEntry> entries2;
 	private AtomEntry entry1;
 	private AtomEntry entry2;
 	private AtomEntry entry3;
@@ -125,20 +125,19 @@ public class EntryDaoTests {
 		contributors.add(contributor1);
 		contributors.add(contributor2);
 		
-		
 		feed1 = new AtomFeed("Title of feed1", "yahoo.com/feed1a", date1);
-		feed1.setAuthors(authors1);
+		feed1.addAuthors(authors1);
 		feed1.setCategories(categories1);
 		feed1.setContributors(contributors);
 		feed2 = new AtomFeed("Title of feed2", "google.com/feed2b", date2);
 		feed3 = new AtomFeed("Title of feed3", "google.com/feed3", date2);
-		feed3.setAuthors(authors2);
+		feed3.addAuthors(authors2);
 		feed3.setCategories(categories2);
 		
-		entries1 = new ArrayList<AtomEntry>();
-		entries2 = new ArrayList<AtomEntry>();
+		entries1 = new HashSet<AtomEntry>();
+		entries2 = new HashSet<AtomEntry>();
 		entry1 = new AtomEntry("Entry Title 1", "entry1111.com/entry1", date1);
-		entry1.setAuthors(authors1);
+		entry1.addAuthors(authors1);
 		entry1.setCategories(categories1);
 		entry1.setContributors(contributors);
 		entry1.setContent("This is the content blah blah blah");
@@ -149,7 +148,7 @@ public class EntryDaoTests {
 		entry1.setSummary("This is the summary of entry1");
 
 		entry2 = new AtomEntry("Entry Title 2: The Second Coming", "entry2222.com/entry2", date2);
-		entry2.setAuthors(authors2);
+		entry2.addAuthors(authors2);
 		entry2.setCategories(categories2);
 		entry2.setContributors(contributors);
 		entry2.setContent("This is the content of the second entry blah blah blah");
@@ -160,7 +159,7 @@ public class EntryDaoTests {
 		entry2.setSummary("This is the summary of entry2");
 
 		entry3 = new AtomEntry("Entry Title 3: The Treble Coming", "entry333.com/entry3", date2);
-		entry3.setAuthors(authors3);
+		entry3.addAuthors(authors3);
 		entry3.setCategories(categories2);
 		entry3.setContributors(contributors);
 		entry3.setContent("This is the content of the third entry blah blah blah");
@@ -175,8 +174,8 @@ public class EntryDaoTests {
 		entries1.add(entry2);
 		entries2.add(entry3);
 		
-		feed1.setEntries(entries1);
-		feed2.setEntries(entries2);
+		feed1.addEntries(entries1);
+		feed2.addEntries(entries2);
 
 
 		// delete old data
@@ -241,31 +240,24 @@ public class EntryDaoTests {
 
 	@Test
 	public void testGetEntryById() {
-		jdbc.execute("delete from feeds"); // clear table
-		jdbc.execute("delete from entries"); // clear table
-		
-		AtomEntry rEntry = entryDao.getEntryById(entry1.getId());
+		AtomEntry rEntry = entryDao.getEntryById(entry1.getGlobalId());
 		assertEquals("There are no db entries, should be 0 matches", null, rEntry);
 		
 		feedDao.createFeed(feed1); // creates two entries (1, 2)
 		
 		// there should be entry1 in there (it was part of feed1)
-		String entryId = entry1.getId();
+		String entryId = entry1.getGlobalId();
 		rEntry = entryDao.getEntryById(entryId);
 		assertEquals("Should be entry1's id in the database", "Entry Title 1", rEntry.getTitle());
 		
 		// there should also be entry2 in there (it was part of feed1)
-		entryId = entry2.getId();
+		entryId = entry2.getGlobalId();
 		rEntry = entryDao.getEntryById(entryId);
 		assertEquals("Should be entry2's id in the database", "Entry Title 2: The Second Coming", rEntry.getTitle());
 	}
 
 	@Test
 	public void testGetEntriesByAuthorName() {
-		jdbc.execute("delete from feeds"); // clear table
-		jdbc.execute("delete from authors"); // clear table
-		jdbc.execute("delete from entries"); // clear table
-
 		Set<AtomEntry> rEntries = entryDao.getEntriesByAuthorName("george");
 		assertEquals("there should be no entries cited by george", 0, rEntries.size());
 
@@ -340,11 +332,55 @@ public class EntryDaoTests {
 	}
 	
 	@Test
-	public void testAddEntriesToFeed() {		
+	public void testCreateEntry() {
+		// null out feed1's entries and check against null set
+		feed1.setEntries(null);
 		feedDao.createFeed(feed1);
-		Set<AtomEntry> rEntries = entryDao.getAllEntries();
-		assertEquals("Should have only two entries", 2, rEntries.size());
+		Set<AtomEntry> rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Empty set test: Should have zero entries", 0, rEntries.size());
 		
+		// check against empty set
+		feed1.setEntries(new HashSet<AtomEntry>());
+		feedDao.createFeed(feed1);
+		rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Empty set test: Should have zero entries", 0, rEntries.size());
+		
+		// Add an entry to feed1 and check
+		entryDao.createEntry(entry1, feed1);
+		rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Should have a single entry", 1, rEntries.size());
+		
+		// add entry1 again to check that it won't add a duplicate
+		entryDao.createEntry(entry1, feed1);
+		rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Should have a single entry", 1, rEntries.size());
+
+		//  add a couple more
+		entryDao.createEntry(entry2, feed1);
+		entryDao.createEntry(entry3, feed1);
+		rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Should have 3 entries", 3, rEntries.size());
+
+	}
+
+	
+	@Test
+	public void testAddEntriesToFeed() {
+		
+		// check that there are zero entries in testFeed
+		feedDao.createFeed(feed1);
+		Set<AtomEntry> rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Should have two entries", 2, rEntries.size());
+		
+		//  add one entry (entries2 has a set of one) to feed1 and check it's entries have increased
+		entryDao.addEntiresToFeed(entries2, feed1);
+		rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Should have 3 entries", 3, rEntries.size());
+
+		// now check that it won't add duplicates (entries1 was a set inside feed1 when it was created)
+		entryDao.addEntiresToFeed(entries1, feed1);
+		rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Should not have added duplicates to testFeed", 3, rEntries.size());
 
 	}
 
@@ -356,8 +392,22 @@ public class EntryDaoTests {
 		
 		rEntries = entryDao.getEntriesFromFeed(feed1);
 		assertEquals("Should have retrieved two entries", 2, rEntries.size());
+		
+		// add a couple more entries via feed2, check again
+		feedDao.createFeed(feed2);
+		rEntries = entryDao.getAllEntries();
+		assertEquals("Should have three entries total from two feeds", 3, rEntries.size());
+
+		// but still only two from feed1
+		rEntries = entryDao.getEntriesFromFeed(feed1);
+		assertEquals("Should have retrieved two entries", 2, rEntries.size());
+		
+		// and only one from feed2
+		rEntries = entryDao.getEntriesFromFeed(feed2);
+		assertEquals("Should have retrieved one entry", 1, rEntries.size());
+
 
 	}
 
-
+	
 }

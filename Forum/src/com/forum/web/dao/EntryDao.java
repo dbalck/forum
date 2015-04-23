@@ -32,6 +32,16 @@ public class EntryDao {
 		System.out.println("entryDao is live");
 	}
 	
+	public void createEntry(AtomEntry entry, AtomFeed feed) throws NullPointerException {
+		if (entry == null || feed == null) {
+			throw new NullPointerException(" null entry or feed");
+		}
+		
+		feed.addEntry(entry);
+		session().saveOrUpdate(feed);
+		
+	}
+	
 	@SuppressWarnings("unchecked")
 	public Set<AtomEntry> getAllEntries() {
 		Query query = session().createQuery("from AtomEntry");
@@ -39,17 +49,18 @@ public class EntryDao {
 		return result;
 	}
 		
-	// queries based on id (a md5 UUID hash of the globalId)
 	public boolean exists(AtomEntry entry) {
 		String id = entry.getId();
 		AtomEntry ret = (AtomEntry) session().get(AtomEntry.class, id);
 		return ret != null ? true : false;
 	}
 	
-	// gets the Entry based on the entry's UUID (id field)
+	// queries by the Entry's globalId
 	// returns null if it doesn't exist
 	public AtomEntry getEntryById(String id) {
-		AtomEntry entry = (AtomEntry) session().get(AtomEntry.class, id);
+		Criteria crit = session().createCriteria(AtomEntry.class);
+		crit.add(Restrictions.eq("globalId", id));
+		AtomEntry entry = (AtomEntry) crit.uniqueResult();
 		return entry;
 	}
 	
@@ -86,16 +97,16 @@ public class EntryDao {
 		return result;
 	}
 	
-	public void addEntiresToFeed(Set<AtomEntry> entries, AtomFeed feed) {
-		feed.addEntries(entries);
-		session().saveOrUpdate(feed);
-		session().flush();
+	public void addEntiresToFeed(Set<AtomEntry> entries, AtomFeed feed) {		
+		for (AtomEntry entry: entries) {
+			this.createEntry(entry, feed);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
 	public Set<AtomEntry> getEntriesFromFeed(AtomFeed feed) {
 		Criteria crit = session().createCriteria(AtomEntry.class);
-		crit.createCriteria("feed", "f");
+		crit.createAlias("feed", "f");
 		crit.add(Restrictions.eq("f.id", feed.getId()));
 		Set<AtomEntry> result =  new LinkedHashSet<AtomEntry>(crit.list());
 		return result;

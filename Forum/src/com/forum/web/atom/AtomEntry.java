@@ -1,17 +1,20 @@
 package com.forum.web.atom;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -27,19 +30,21 @@ public class AtomEntry implements Article {
 	//required attributes
 	private String title;
 	
+	// the business key
 	@Column(name="global_entry_id")
 	private String globalId;
+	
 	private long updated;
 
 	// recommended attributes
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name="entry_id")
-	// @LazyCollection(LazyCollectionOption.FALSE)
-	private Set<Author> authors;
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name="entries_authors", 
+		joinColumns = { @JoinColumn(name = "entry_id")}, 
+		inverseJoinColumns= { @JoinColumn(name = "author_id")})
+	private Set<Author> authors = new HashSet<Author>();
 	
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name="entry_id")
-	// @LazyCollection(LazyCollectionOption.FALSE)
 	private Set<Contributor> contributors;
 
 	private String link; 
@@ -65,7 +70,9 @@ public class AtomEntry implements Article {
 	
 	@Id
 	@Column(name="entry_id")
+	@GeneratedValue
 	private String id;
+	
 	private int hash;
 	
 	public AtomEntry() {}
@@ -74,7 +81,6 @@ public class AtomEntry implements Article {
 		this.title = title;
 		this.globalId = globalId;
 		this.updated = updated;
-		this.id = generateId(globalId);
 	}
 
 	public String getTitle() {
@@ -221,11 +227,24 @@ public class AtomEntry implements Article {
 	public void setHash(int hash) {
 		this.hash = hash;
 	}
-
-	private String generateId(String id) {
-		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());
-		return uuid.toString();
+	
+	public void addFeed(AtomFeed feed) {
+		feed.addEntry(this);
+		setFeed(feed);
 	}
+	
+	public void removeFeed(AtomFeed feed) {
+		feed.removeEntry(this);
+		setFeed(null);
+	}
+	
+	public void addAuthors(Set<Author> authors) {
+		for (Author a: authors) {
+			a.addEntry(this);
+		}
+		this.authors.addAll(authors);
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -234,7 +253,7 @@ public class AtomEntry implements Article {
 		}
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((globalId == null) ? 0 : globalId.hashCode());
 		return result;
 	}
 
@@ -250,7 +269,7 @@ public class AtomEntry implements Article {
 		if (id == null) {
 			if (other.id != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!globalId.equals(other.getGlobalId()))
 			return false;
 		return true;
 	}
