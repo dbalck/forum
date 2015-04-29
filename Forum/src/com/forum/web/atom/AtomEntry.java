@@ -16,15 +16,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Immutable;
 
 import com.forum.web.parse.Article;
 import com.forum.web.parse.Parser;
 
 @Entity
 @Table(name="entries")
+@Immutable
 public class AtomEntry implements Article {
 
 	//required attributes
@@ -43,9 +45,11 @@ public class AtomEntry implements Article {
 		inverseJoinColumns= { @JoinColumn(name = "author_id")})
 	private Set<Author> authors = new HashSet<Author>();
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name="entry_id")
-	private Set<Contributor> contributors;
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name="entries_contributors", 
+		joinColumns = { @JoinColumn(name = "entry_id")}, 
+		inverseJoinColumns= { @JoinColumn(name = "contributor_id")})
+	private Set<Contributor> contributors = new HashSet<Contributor>();
 
 	private String link; 
 	private String content; 
@@ -66,12 +70,13 @@ public class AtomEntry implements Article {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="source_id")
 	private AtomFeed source;
+	
 	private String rights;
 	
 	@Id
 	@Column(name="entry_id")
 	@GeneratedValue
-	private String id;
+	private int id;
 	
 	private int hash;
 	
@@ -179,11 +184,11 @@ public class AtomEntry implements Article {
 		this.rights = rights;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	
@@ -244,7 +249,13 @@ public class AtomEntry implements Article {
 		}
 		this.authors.addAll(authors);
 	}
-
+	
+	public void addContributors(Set<Contributor> contributors) {
+		for (Contributor c: contributors) {
+			c.addEntry(this);
+		}
+		this.contributors.addAll(contributors);
+	}
 
 	@Override
 	public int hashCode() {
@@ -266,8 +277,8 @@ public class AtomEntry implements Article {
 		if (getClass() != obj.getClass())
 			return false;
 		AtomEntry other = (AtomEntry) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (globalId == null) {
+			if (other.globalId != null)
 				return false;
 		} else if (!globalId.equals(other.getGlobalId()))
 			return false;

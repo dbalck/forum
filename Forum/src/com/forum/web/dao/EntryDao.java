@@ -50,9 +50,12 @@ public class EntryDao {
 	}
 		
 	public boolean exists(AtomEntry entry) {
-		String id = entry.getId();
-		AtomEntry ret = (AtomEntry) session().get(AtomEntry.class, id);
+		String id = entry.getGlobalId();
+		Criteria crit = session().createCriteria(AtomEntry.class);
+		crit.add(Restrictions.eq("globalId", id));
+		AtomEntry ret = (AtomEntry) crit.uniqueResult();
 		return ret != null ? true : false;
+
 	}
 	
 	// queries by the Entry's globalId

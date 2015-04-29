@@ -64,18 +64,18 @@ public class ChannelDaoTests {
 		jdbc.execute("delete from textinputs");
 		jdbc.execute("delete from skipdays");
 		
-		item1 = new RssItem("title1", "example1.com", "this is the first item");
+		item1 = new RssItem("title1", "example1.com", "this is the first item", null);
 		enclosure1 = new Enclosure(888, "this is the enclosure type", "enclosureurl.com");
-		item1.setEnclosure(enclosure1);
+		item1.addEnclosure(enclosure1);
 		
-		item2 = new RssItem("title2", "example2.com", "this is the second item");
+		item2 = new RssItem("title2", "example2.com", "this is the second item", null);
 		
 		items1 = new HashSet<RssItem>();
 		items1.add(item1);
 		items1.add(item2);
 		
-		item3 = new RssItem("ninjas attack the white house", "example3.com", "The identity of the culprits is still unknown");
-		item4 = new RssItem("Senator admits to love affair with staffer", "example4.com", "Constituents report that they are unsurprised");
+		item3 = new RssItem("ninjas attack the white house", "example3.com", "The identity of the culprits is still unknown", null);
+		item4 = new RssItem("Senator admits to love affair with staffer", "example4.com", "Constituents report that they are unsurprised", null);
 		items2 = new HashSet<RssItem>();
 		items2.add(item3);
 		items2.add(item4);
@@ -90,16 +90,16 @@ public class ChannelDaoTests {
 		sd1 = new SkipDays(days);
 		
 		channel1 = new RssChannel("Anti-Tank - R - US", "example1.com", "Your most reliable source for Anti-tank-weapon-news");
-		channel1.setItems(items1);
-		channel1.setImage(image1);
-		channel1.setTextInput(ti1);
-		channel1.setSkipDays(sd1);
+		channel1.addItems(items1);
+		channel1.addImage(image1);
+		channel1.addTextInput(ti1);
+		channel1.addSkipDays(sd1);
 		
 		channel2 = new RssChannel("All puppies, all the time", "example1.com", "This is the first channel");
-		channel2.setItems(items2);
-		channel2.setImage(image1);
-		channel2.setTextInput(ti1);
-		channel2.setSkipDays(sd1);
+		channel2.addItems(items2);
+		channel2.addImage(image1);
+		channel2.addTextInput(ti1);
+		channel2.addSkipDays(sd1);
 	}
 	
 	@Test

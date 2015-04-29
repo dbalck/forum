@@ -171,12 +171,12 @@ public class FeedDaoTests {
 		feedDao.createFeed(feed2);
 		feeds = feedDao.getAllFeeds();
 		assertEquals("There should three feeds in the db -- two regular and one source", 3, feeds.size());
-		String feedId = feed2.getId();
+		String feedId = feed2.getGlobalId();
 		AtomFeed rFeed2 = feedDao.getFeedById(feedId);
 		assertEquals("The returned feed should have the correct title", "Title of feed2", rFeed2.getTitle());
 		// feed2 should have all it's initialized fields
 		
-		feedId = feed1.getId();
+		feedId = feed1.getGlobalId();
 		AtomFeed rFeed1 = feedDao.getFeedById(feedId);
 		assertEquals("feed1 should have date1", date1, rFeed1.getUpdated());
 		assertEquals("feed1 should have title1", "Title of feed1", rFeed1.getTitle());
@@ -227,7 +227,7 @@ public class FeedDaoTests {
 		assertEquals("There are no db entries, should be 0 matches", null, rFeed);
 		
 		feedDao.createFeed(feed2);
-		String feedId = feed2.getId();
+		String feedId = feed2.getGlobalId();
 		rFeed = feedDao.getFeedById(feedId);
 		assertEquals("Should be feed2's id in the database", "Title of feed2", rFeed.getTitle());
 	}

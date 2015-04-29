@@ -32,6 +32,16 @@ public class ChannelDao {
 		return sessionFactory.getCurrentSession();
 	}
 	
+	// queries based on title and link;
+	public boolean exists(RssChannel channel) {
+		String id = channel.getLink();
+		Criteria crit = session().createCriteria(RssChannel.class);
+		crit.add(Restrictions.eq("link", id));
+		RssChannel ret = (RssChannel) crit.uniqueResult();
+		
+		return ret != null ? true : false;
+	}
+	
 	public void createChannel(RssChannel channel) {
 		if (!exists(channel)) {
 			session().save(channel);
@@ -47,15 +57,11 @@ public class ChannelDao {
 	
 	
 	public RssChannel getChannelById(String id) {
-		return (RssChannel) session().get(RssChannel.class, id);
+		Criteria crit = session().createCriteria(RssChannel.class);
+		crit.add(Restrictions.eq("link", id));
+		return (RssChannel) crit.uniqueResult();
 	}
 			
-	// queries based on title and link;
-	public boolean exists(RssChannel channel) {
-		String id = channel.getId();
-		RssChannel ret = (RssChannel) session().get(RssChannel.class, id);
-		return ret != null ? true : false;
-	}
 	
 	// Returns all the channels whose title strings at lease partially match (case insensitive) the argument string
 	@SuppressWarnings("unchecked")

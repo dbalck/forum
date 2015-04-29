@@ -1,10 +1,11 @@
 package com.forum.web.rss;
 
-import java.util.UUID;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -13,8 +14,11 @@ public class Image {
 	
 	@Id
 	@Column(name="image_id")
-	private String id;
-	private int hash;
+	@GeneratedValue
+	private int id;
+	
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "image")
+	private RssChannel channel;
 	
 	// required
 	private String title;
@@ -26,14 +30,14 @@ public class Image {
 	private int height;
 	private int width;
 		
+	private int hash;
+
 	public Image() {}
 	
 	public Image(String title, String link, String url) {
 		this.title = title;
 		this.link = link;
 		this.url = url;
-		this.id = generateId(title + link + url);
-
 	}
 
 	public String getTitle() {
@@ -92,27 +96,37 @@ public class Image {
 		this.hash = hash;
 	}
 	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
+	}	
+
+	public RssChannel getChannel() {
+		return channel;
 	}
-	
-	private String generateId(String id) {
-		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());
-		return uuid.toString();
+
+	public void setChannel(RssChannel channel) {
+		this.channel = channel;
 	}
-	
+
 	@Override
 	public int hashCode() {
-		if (this.hash == 0) {
+		if (hash == 0) {
 			final int prime = 31;
 			int result = 1;
-			this.hash = prime * result + ((id == null) ? 0 : id.hashCode());
+			result = prime * result
+					+ ((description == null) ? 0 : description.hashCode());
+			result = prime * result + height;
+			result = prime * result + ((link == null) ? 0 : link.hashCode());
+			result = prime * result + ((title == null) ? 0 : title.hashCode());
+			result = prime * result + ((url == null) ? 0 : url.hashCode());
+			result = prime * result + width;
+			hash = result;
 		}
-		return this.hash;
+		return hash;
 	}
 
 	@Override
@@ -124,10 +138,29 @@ public class Image {
 		if (getClass() != obj.getClass())
 			return false;
 		Image other = (Image) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (description == null) {
+			if (other.description != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!description.equals(other.description))
+			return false;
+		if (height != other.height)
+			return false;
+		if (link == null) {
+			if (other.link != null)
+				return false;
+		} else if (!link.equals(other.link))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		if (url == null) {
+			if (other.url != null)
+				return false;
+		} else if (!url.equals(other.url))
+			return false;
+		if (width != other.width)
 			return false;
 		return true;
 	}

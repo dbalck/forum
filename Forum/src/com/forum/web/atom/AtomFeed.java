@@ -44,9 +44,11 @@ public class AtomFeed implements Stream {
 		inverseJoinColumns= { @JoinColumn(name = "author_id")})
 	private Set<Author> authors = new HashSet<Author>();
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name="feed_id")
-	private Set<Contributor> contributors; 
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name="feeds_contributors", 
+		joinColumns = { @JoinColumn(name = "feed_id")}, 
+		inverseJoinColumns= { @JoinColumn(name = "contributor_id")})
+	private Set<Contributor> contributors = new HashSet<Contributor>();
 
 	private String link;
 	
@@ -70,7 +72,7 @@ public class AtomFeed implements Stream {
 	@Id
 	@Column(name="feed_id")
 	@GeneratedValue
-	private String id;
+	private int id;
 	
 	private int hash;
 		
@@ -187,11 +189,11 @@ public class AtomFeed implements Stream {
 		this.entries = entries;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	
@@ -263,6 +265,14 @@ public class AtomFeed implements Stream {
 		}
 	}
 	
+	public void addContributors(Set<Contributor> contributors) {
+		for (Contributor c: contributors) {
+			c.addFeed(this);
+		}
+		this.contributors.addAll(contributors);
+	}
+
+	
 	@Override
 	public int hashCode() {
 		if (this.hash == 0) {
@@ -282,8 +292,8 @@ public class AtomFeed implements Stream {
 		if (getClass() != obj.getClass())
 			return false;
 		AtomFeed other = (AtomFeed) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (globalId == null) {
+			if (other.globalId != null)
 				return false;
 		} else if (!globalId.equals(other.getGlobalId()))
 			return false;

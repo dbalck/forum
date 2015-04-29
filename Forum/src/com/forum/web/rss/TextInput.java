@@ -1,10 +1,11 @@
 package com.forum.web.rss;
 
-import java.util.UUID;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -19,7 +20,12 @@ public class TextInput {
 	
 	@Id
 	@Column(name="textinput_id")
-	private String id;
+	@GeneratedValue
+	private int id;
+	
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "textInput")
+	private RssChannel channel;
+	
 	private int hash;
 	
 	public TextInput() {}
@@ -29,7 +35,6 @@ public class TextInput {
 		this.link = link;
 		this.description = description;
 		this.name = name;
-		this.id = generateId(title + link + description + name);
 	}
 	
 	public String getTitle() {
@@ -72,27 +77,35 @@ public class TextInput {
 		this.hash = hash;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
-	
-	private String generateId(String id) {
-		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());
-		return uuid.toString();
+		
+	public RssChannel getChannel() {
+		return channel;
 	}
-	
+
+	public void setChannel(RssChannel channel) {
+		this.channel = channel;
+	}
+
 	@Override
 	public int hashCode() {
-		if (this.hash == 0) {
+		if (hash == 0) {
 			final int prime = 31;
 			int result = 1;
-			this.hash = prime * result + ((id == null) ? 0 : id.hashCode());
+			result = prime * result
+					+ ((description == null) ? 0 : description.hashCode());
+			result = prime * result + ((link == null) ? 0 : link.hashCode());
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			result = prime * result + ((title == null) ? 0 : title.hashCode());
+			hash = result;
 		}
-		return this.hash;
+		return hash;
 	}
 
 	@Override
@@ -104,14 +117,28 @@ public class TextInput {
 		if (getClass() != obj.getClass())
 			return false;
 		TextInput other = (TextInput) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (description == null) {
+			if (other.getDescription() != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!description.equals(other.getDescription()))
+			return false;
+		if (link == null) {
+			if (other.getLink() != null)
+				return false;
+		} else if (!link.equals(other.getLink()))
+			return false;
+		if (name == null) {
+			if (other.getName() != null)
+				return false;
+		} else if (!name.equals(other.getName()))
+			return false;
+		if (title == null) {
+			if (other.getTitle() != null)
+				return false;
+		} else if (!title.equals(other.getTitle()))
 			return false;
 		return true;
 	}
-
 
 	@Override
 	public String toString() {

@@ -1,10 +1,11 @@
 package com.forum.web.rss;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @Entity
@@ -16,7 +17,13 @@ public class Enclosure {
 	
 	@Id
 	@Column(name="enclosure_id")
-	private String id;
+	@GeneratedValue
+	private int id;
+	
+	@OneToOne
+	@PrimaryKeyJoinColumn
+	private RssItem item;
+
 	private int hash;
 	
 	public Enclosure() {}
@@ -25,12 +32,15 @@ public class Enclosure {
 		this.length = length;
 		this.type = type;
 		this.url = url;
-		this.id = generateId(type + url);
 
 	}
 		
 	public void setLength(int length) {
 		this.length = length;
+	}
+	
+	public int getLength() {
+		return this.length;
 	}
 
 	public void setType(String type) {
@@ -58,27 +68,33 @@ public class Enclosure {
 		this.hash = hash;
 	}
 	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
-	
-	private String generateId(String id) {
-		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());
-		return uuid.toString();
+
+	public RssItem getItem() {
+		return item;
 	}
-	
+
+	public void setItem(RssItem item) {
+		this.item = item;
+	}
+
 	@Override
 	public int hashCode() {
-		if (this.hash == 0) {
+		if (hash == 0) {
 			final int prime = 31;
 			int result = 1;
-			this.hash = prime * result + ((id == null) ? 0 : id.hashCode());
+			result = prime * result + length;
+			result = prime * result + ((type == null) ? 0 : type.hashCode());
+			result = prime * result + ((url == null) ? 0 : url.hashCode());
+			hash = result;
 		}
-		return this.hash;
+		return hash;
 	}
 
 	@Override
@@ -90,14 +106,20 @@ public class Enclosure {
 		if (getClass() != obj.getClass())
 			return false;
 		Enclosure other = (Enclosure) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (length != other.getLength())
+			return false;
+		if (type == null) {
+			if (other.type != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!type.equals(other.getType()))
+			return false;
+		if (url == null) {
+			if (other.getUrl() != null)
+				return false;
+		} else if (!url.equals(other.getUrl()))
 			return false;
 		return true;
 	}
-
 
 	@Override
 	public String toString() {

@@ -381,8 +381,7 @@ public class RssParser extends Parser {
 							
 							if (top.containsKey("textInput")) {
 								TextInput ti = (TextInput) top.get("textInput");
-								ti.setId(channel.getId());
-								channel.setTextInput(ti);
+								channel.addTextInput(ti);
 							}
 
 							if (top.containsKey("ttl")) {
@@ -409,7 +408,8 @@ public class RssParser extends Parser {
 							item = new RssItem(
 									(String) top.get("title"), 
 									(String) top.get("link"), 
-									(String) top.get("description"));
+									(String) top.get("description"),
+									(String) top.get("guid"));
 							
 							// add optional fields if they exist
 							if (top.containsKey("author")) {
@@ -427,11 +427,7 @@ public class RssParser extends Parser {
 //							if (top.containsKey("enclosure")) {
 //								item.setEnclosure((Enclosure) top.get("enclosure"));
 //							}
-							
-							if (top.containsKey("guid")) {
-								item.setGuid((String) top.get("guid"));
-							}
-							
+														
 							if (top.containsKey("pubDate")) {
 								item.setPubDate(parseDateRss((String) top.get("pubDate")));
 							}

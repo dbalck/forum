@@ -1,17 +1,19 @@
 package com.forum.web.rss;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
@@ -30,30 +32,29 @@ public class RssChannel implements Stream {
 	private String title; 
 	private String link; 
 	private String description;
-	
-	// child objects
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name="channel_id")
-	private Set<RssItem> items;
+		
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "channel")
+	private Set<RssItem> items = new HashSet<RssItem>();
 	
 	// private List<Integer> skipHours;
-	
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name="channel_id")
-	private SkipDays skipDays;
-	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne
 	@JoinColumn(name="channel_id")
 	private Image image;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name="channel_id")
+	@OneToOne
+	@PrimaryKeyJoinColumn
+	private SkipDays skipDays;
+	
+	@OneToOne
+	@PrimaryKeyJoinColumn
 	private TextInput textInput;
+
 
 	// id for persistence/hibernate
 	@Id
 	@Column(name="channel_id")
-	private String id;
+	@GeneratedValue
+	private int id;
 	private int hash;
 	
 	private long pubDate;
@@ -75,7 +76,6 @@ public class RssChannel implements Stream {
 		this.title = title;
 		this.link = link;
 		this.description = description;
-		this.id = generateId(title + link);
 	}
 	
 	public String getTitle() {
@@ -142,11 +142,11 @@ public class RssChannel implements Stream {
 		this.textInput = textInput;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -246,6 +246,20 @@ public class RssChannel implements Stream {
 		this.webMaster = webMaster;
 	}
 	
+	public void addItem(RssItem item) {
+		item.setChannel(this);
+		getItems().add(item);
+	}
+	
+	public void addItems(Set<RssItem> items) {
+		if (items != null) {
+			for (RssItem item: items) {
+				addItem(item);
+			}			
+		}
+	}
+
+	
 	// unimplemented Article interface methods
 	public String date() {
 		return Parser.buildDate(getPubDate());
@@ -278,11 +292,6 @@ public class RssChannel implements Stream {
 		return StreamType.RSS;
 	}
 	
-	private String generateId(String id) {
-		UUID uuid = UUID.nameUUIDFromBytes(id.getBytes());
-		return uuid.toString();
-	}
-
 	public int getHash() {
 		return hash;
 	}
@@ -294,15 +303,29 @@ public class RssChannel implements Stream {
 	public void setTtl(int ttl) {
 		this.ttl = ttl;
 	}
+	
+	public void addTextInput(TextInput ti) {
+		ti.setChannel(this);
+		this.textInput = ti;
+	}
+	
+	public void addImage(Image image) {
+		image.setChannel(this);
+		this.image = image;
+	}
+
+	public void addSkipDays(SkipDays days) {
+		days.setChannel(this);
+		this.skipDays = days;
+	}
+
 
 	@Override
 	public int hashCode() {
-		if (this.hash == 0) {
-			final int prime = 31;
-			int result = 1;
-			this.hash = prime * result + ((id == null) ? 0 : id.hashCode());
-		}
-		return this.hash;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((link == null) ? 0 : link.hashCode());
+		return result;
 	}
 
 	@Override
@@ -314,10 +337,10 @@ public class RssChannel implements Stream {
 		if (getClass() != obj.getClass())
 			return false;
 		RssChannel other = (RssChannel) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (link == null) {
+			if (other.link != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!link.equals(other.getLink()))
 			return false;
 		return true;
 	}

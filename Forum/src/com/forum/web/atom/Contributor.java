@@ -1,9 +1,13 @@
 package com.forum.web.atom;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -18,6 +22,12 @@ public class Contributor {
 	@GeneratedValue
 	@Column(name="contributor_id")
 	private String id;
+	
+	@ManyToMany(mappedBy = "contributors")
+	private Set<AtomFeed> feeds = new HashSet<AtomFeed>();
+	
+	@ManyToMany(mappedBy = "contributors")
+	private Set<AtomEntry> entries = new HashSet<AtomEntry>();
 	
 	public Contributor() {}
 	
@@ -56,6 +66,32 @@ public class Contributor {
 	public void setId(String id) {
 		this.id = id;
 	}
+	
+	public Set<AtomFeed> getFeeds() {
+		return feeds;
+	}
+
+	public void setFeeds(Set<AtomFeed> feeds) {
+		this.feeds = feeds;
+	}
+
+	public Set<AtomEntry> getEntries() {
+		return entries;
+	}
+
+	public void setEntries(Set<AtomEntry> entries) {
+		this.entries = entries;
+	}
+
+	public void addFeed(AtomFeed feed) {
+		this.feeds.add(feed);
+	}
+
+	public void addEntry(AtomEntry entry) {
+		this.entries.add(entry);
+		
+	}
+
 	
 	
 }
