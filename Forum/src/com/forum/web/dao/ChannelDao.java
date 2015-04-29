@@ -38,8 +38,13 @@ public class ChannelDao {
 		Criteria crit = session().createCriteria(RssChannel.class);
 		crit.add(Restrictions.eq("link", id));
 		RssChannel ret = (RssChannel) crit.uniqueResult();
-		
-		return ret != null ? true : false;
+		if (ret != null) {
+			System.out.println("channel exists, forgoing channel save");
+			return true;
+		} else {
+			System.out.println("channel doesn't exist, saving channel");
+			return false;
+		}
 	}
 	
 	public void createChannel(RssChannel channel) {

@@ -95,7 +95,7 @@ public class ChannelDaoTests {
 		channel1.addTextInput(ti1);
 		channel1.addSkipDays(sd1);
 		
-		channel2 = new RssChannel("All puppies, all the time", "example1.com", "This is the first channel");
+		channel2 = new RssChannel("All puppies, all the time", "example2.com", "This is the second channel");
 		channel2.addItems(items2);
 		channel2.addImage(image1);
 		channel2.addTextInput(ti1);
@@ -132,7 +132,20 @@ public class ChannelDaoTests {
 	
 	@Test
 	public void testGetChannelsByTitle() {
+		// empty set (no channels created)
+		Set<RssChannel> channels = channelDao.getChannelsByTitle(channel1.getTitle());
+		assertEquals("There should no channels with that title", 0, channels.size());	
 
+		// one channel created
+		channelDao.createChannel(channel1);
+		channels = channelDao.getChannelsByTitle(channel1.getTitle());
+		assertEquals("There should one channel with that title", 1, channels.size());	
+
+		RssChannel temp = new RssChannel(channel1.getTitle(), "BB.com", "CC");
+		channelDao.createChannel(temp);
+
+		channels = channelDao.getChannelsByTitle(channel1.getTitle());
+		assertEquals("There should two channels with that title", 2, channels.size());	
 		
 	}
 
