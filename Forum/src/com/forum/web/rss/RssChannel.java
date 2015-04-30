@@ -16,15 +16,12 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Immutable;
-
 import com.forum.web.parse.Article;
 import com.forum.web.parse.Parser;
 import com.forum.web.parse.Stream;
 import com.forum.web.parse.StreamType;
 
 @Entity
-@Immutable
 @Table(name="channels")
 public class RssChannel implements Stream {
 	

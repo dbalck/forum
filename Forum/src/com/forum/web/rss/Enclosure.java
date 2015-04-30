@@ -1,5 +1,6 @@
 package com.forum.web.rss;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,8 +21,7 @@ public class Enclosure {
 	@GeneratedValue
 	private int id;
 	
-	@OneToOne
-	@PrimaryKeyJoinColumn
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "enclosure")
 	private RssItem item;
 
 	private int hash;

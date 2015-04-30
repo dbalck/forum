@@ -44,6 +44,7 @@ public class ChannelDaoTests {
 	private SkipDays sd1;
 	private RssChannel channel1;
 	private RssChannel channel2;
+	private RssChannel channel3;
 	private Set<RssItem> items1;
 	private Set<RssItem> items2;
 	
@@ -100,6 +101,9 @@ public class ChannelDaoTests {
 		channel2.addImage(image1);
 		channel2.addTextInput(ti1);
 		channel2.addSkipDays(sd1);
+		
+		channel3 = new RssChannel("this is channel 3", "example3.com", "This is the third channel");
+
 	}
 	
 	@Test
@@ -126,7 +130,19 @@ public class ChannelDaoTests {
 	
 	@Test
 	public void testGetAllChannels() {
+		// empty set (no channels created)
+		Set<RssChannel> channels = channelDao.getAllChannels();
+		assertEquals("There should no channels created", 0, channels.size());	
+		
+		channelDao.createChannel(channel1);
+		channels = channelDao.getAllChannels();
+		assertEquals("There should only be one channel", 1, channels.size());
 
+		channelDao.createChannel(channel2);
+		channelDao.createChannel(channel3);
+
+		channels = channelDao.getAllChannels();
+		assertEquals("There should be three channels", 3, channels.size());
 		
 	}
 	
@@ -147,6 +163,31 @@ public class ChannelDaoTests {
 		channels = channelDao.getChannelsByTitle(channel1.getTitle());
 		assertEquals("There should two channels with that title", 2, channels.size());	
 		
+	}
+	
+	@Test
+	public void testGetChannelFromItem() {
+		
+		// channel1 created with item1 and item2
+		channelDao.createChannel(channel1);
+		RssChannel channel = channelDao.getChannelFromItem(item1);
+		assertEquals("item1 corresponds to channe1", "Anti-Tank - R - US", channel.getTitle());	
+
+		channel = channelDao.getChannelFromItem(item2);
+		assertEquals("item2 corresponds to channe1", "Anti-Tank - R - US", channel.getTitle());	
+		
+		channelDao.createChannel(channel2);
+		
+		// try again with item1, should return same
+		channel = channelDao.getChannelFromItem(item1);
+		assertEquals("item1 corresponds to channe1", "Anti-Tank - R - US", channel.getTitle());	
+		
+		// now go with item3 and channel2
+		channel = channelDao.getChannelFromItem(item3);
+		assertEquals("item3 corresponds to channe2", "All puppies, all the time", channel.getTitle());	
+		
+
+
 	}
 
 	

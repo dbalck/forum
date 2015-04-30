@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.forum.web.rss.RssChannel;
+import com.forum.web.rss.RssItem;
 
 @Transactional
 @Component("channelDao")
@@ -66,6 +67,10 @@ public class ChannelDao {
 		crit.add(Restrictions.eq("link", id));
 		return (RssChannel) crit.uniqueResult();
 	}
+	
+	public void updateChannel(RssChannel channel) {
+		session().saveOrUpdate(channel);
+	}
 			
 	
 	// Returns all the channels whose title strings at lease partially match (case insensitive) the argument string
@@ -97,6 +102,12 @@ public class ChannelDao {
 		Set<RssChannel> result =  new LinkedHashSet<RssChannel>(crit.list());
 		
 		return result;
+	}
+	
+	public RssChannel getChannelFromItem(RssItem item) {
+		int id = item.getChannel().getId();
+		return (RssChannel) session().get(RssChannel.class, id);
+
 	}
 	
 	public void deleteChannel(RssChannel channel) {

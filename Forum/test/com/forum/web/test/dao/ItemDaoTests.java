@@ -2,6 +2,11 @@ package com.forum.web.test.dao;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.sql.DataSource;
 
 import org.junit.Before;
@@ -13,74 +18,145 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.forum.web.dao.ChannelDao;
 import com.forum.web.dao.ItemDao;
+import com.forum.web.rss.Enclosure;
+import com.forum.web.rss.Image;
 import com.forum.web.rss.RssChannel;
 import com.forum.web.rss.RssItem;
+import com.forum.web.rss.SkipDays;
+import com.forum.web.rss.TextInput;
 
 @ActiveProfiles("dev")
-@ContextConfiguration(locations={
-		"classpath:com/forum/web/config/dao-context.xml", 
-		"classpath:com/forum/web/test/config/datasource.xml" })
+@ContextConfiguration(locations={"classpath:com/forum/web/config/dao-context.xml", 
+		"classpath:com/forum/web/test/config/datasource.xml",
+		"classpath:com/forum/web/config/dao-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ItemDaoTests {
 
-	RssChannel channel1;
-	
-	RssItem item1; // whole object: all fields filled out
-	RssItem item2;
-	RssItem item3;
-	RssItem item4;
-
+	private JdbcTemplate jdbc;
+	private Enclosure enclosure1;
+	private RssItem item1;
+	private RssItem item2;
+	private RssItem item3;
+	private RssItem item4;
+	private Image image1;
+	private TextInput ti1;
+	private SkipDays sd1;
+	private RssChannel channel1;
+	private RssChannel channel2;
+	private RssChannel channel3;
+	private Set<RssItem> items1;
+	private Set<RssItem> items2;
 	
 	@Autowired
-	private ItemDao itemDao;
+	private ChannelDao channelDao;
 	
 	@Autowired
 	private DataSource dataSource;
 	
+	@Autowired
+	private ItemDao itemDao;
+		
 	@Before
 	public void init() {
-		
-		// clear out the database tables
-		JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-		jdbc.execute("delete from items");
+		jdbc = new JdbcTemplate(dataSource);
 		jdbc.execute("delete from channels");
+		jdbc.execute("delete from images");
+		jdbc.execute("delete from items");
 		jdbc.execute("delete from users");
-
-		/* build the first test channel
-		RssChannel.Builder cb1 = new RssChannel.Builder("NEWS R US", "http://newsrus.com", "We've got all the best news here");
-		channel1 = cb1.build();
+		jdbc.execute("delete from images");
+		jdbc.execute("delete from textinputs");
+		jdbc.execute("delete from skipdays");
 		
-		// build the first test item
-		RssItem.Builder b1 = new RssItem.Builder("The Panthers win the Superbowl", 
-				"http://thisdoesntexist.com",
-				"The Panters beat the Dallas Cowboys 45 - 6 to earn their superbowl XXXXXXXL title");
-		b1.pubDate(1234567898);
-		b1.category("sports");
-		b1.guid("http://thisdoesntexist.com/item2342q353");
-		// b1.enclosure("placeholder for enclosure"); 
-		b1.source("http://someothersite.com/item");
-		b1.author("Burt Reynolds");
-		b1.comments("These are some random comments");
-		item1 = b1.build();
-		*/
+		item1 = new RssItem("title1", "example1.com", "this is the first item", null);
+		enclosure1 = new Enclosure(888, "this is the enclosure type", "enclosureurl.com");
+		item1.addEnclosure(enclosure1);
 		
+		item2 = new RssItem("title2", "example2.com", "this is the second item", null);
+		
+		items1 = new HashSet<RssItem>();
+		items1.add(item1);
+		items1.add(item2);
+		
+		item3 = new RssItem("ninjas attack the white house", "example3.com", "The identity of the culprits is still unknown", null);
+		item4 = new RssItem("Senator admits to love affair with staffer", "example4.com", "Constituents report that they are unsurprised", null);
+		items2 = new HashSet<RssItem>();
+		items2.add(item3);
+		items2.add(item4);
+		
+		image1 = new Image("Title for image", "imagelink.com", "imageurl.com");
+		
+		ti1 = new TextInput("text input title", "textlink.com", "text input description goes here", "name of the text input");
+		
+		List<String> days = new ArrayList<String>();
+		days.add("monday");
+		days.add("tuesday");
+		sd1 = new SkipDays(days);
+		
+		channel1 = new RssChannel("Anti-Tank - R - US", "example1.com", "Your most reliable source for Anti-tank-weapon-news");
+		channel1.addItems(items1);
+		channel1.addImage(image1);
+		channel1.addTextInput(ti1);
+		channel1.addSkipDays(sd1);
+		
+		channel2 = new RssChannel("All puppies, all the time", "example2.com", "This is the second channel");
+		channel2.addItems(items2);
+		channel2.addImage(image1);
+		channel2.addTextInput(ti1);
+		channel2.addSkipDays(sd1);
+		
+		channel3 = new RssChannel("this is channel 3", "example3.com", "This is the third channel");
 	}
 	
 	@Test
-	public void testCreateItem() {
-		assertTrue("dummy test", true);
-	}
-	
-	/*
-	@Test
-	public void testCreateItem() {
-		itemDao.createItem(item1, 1);
-		List<RssItem> items = itemDao.getAllItems();
-		assertEquals("Number of items should be 1", 1, items.size());
+	public void testGetAllItems() {
 		
-	}*/
-	
+		// empty set
+		Set<RssItem> items = itemDao.getAllItems();
+		assertEquals("there should be no items saved yet", 0, items.size());
+		
+		channelDao.createChannel(channel1);
+		items = itemDao.getAllItems();
+		assertEquals("there should be a couple items saved in channel1", 2, items.size());
 
+		channelDao.createChannel(channel2);
+		items = itemDao.getAllItems();
+		assertEquals("there should be a four items saved between channel1 and channel2", 4, items.size());
+		
+		// add a channel without items, double check no change
+		channelDao.createChannel(channel3);
+		items = itemDao.getAllItems();
+		assertEquals("there should be a four items saved between channel1 and channel2", 4, items.size());
+		
+		
+		}
+
+
+	@Test
+	public void testSaveItemToChannel() {
+		
+		channelDao.createChannel(channel1);
+		Set<RssItem> items = itemDao.getAllItems();
+		assertEquals("there should be a couple items saved in channel1", 2, items.size());
+
+		// add another item to channel1 and update		
+		itemDao.saveItemToChannel(new RssItem("AA", "BB", "CC", "DD"), channel1);
+		items = itemDao.getAllItems();
+		assertEquals("there should be three items saved in channel1", 3, items.size());
+
+		// add another item
+		itemDao.saveItemToChannel(item4, channel1);
+		items = itemDao.getAllItems();
+		assertEquals("there should be four items saved in channel1", 4, items.size());
+		
+		channelDao.createChannel(channel2);
+		items = itemDao.getAllItems();
+		assertEquals("there should be four items saved in channel1", 5, items.size());
+
+		
+	}
+
+	
 
 }

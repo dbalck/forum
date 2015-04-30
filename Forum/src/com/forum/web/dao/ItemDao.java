@@ -1,75 +1,80 @@
 package com.forum.web.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-import javax.sql.DataSource;
-
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.forum.web.rss.RssChannel;
 import com.forum.web.rss.RssItem;
 
+@Transactional
 @Component("itemDao")
 public class ItemDao {
 	
+	@Autowired
+	private SessionFactory sessionFactory;
+	
+	public Session session() {
+		return sessionFactory.getCurrentSession();
+	}
+
 	public ItemDao() {
 		System.out.println("successfully loaded itemDao");
 	}
-	
-	private NamedParameterJdbcTemplate jdbc;
-	
-	@Autowired
-	public void setDataSource(DataSource jdbc) {
-		this.jdbc = new NamedParameterJdbcTemplate(jdbc);
-	}
-
+		
 	// gets all the RssItems in the database, regardless of channel
-	public List<RssItem> getAllItems() {
-		return jdbc.query("select * from items", new RowMapper<RssItem>() {
-			public RssItem mapRow(ResultSet rs, int rowNum) throws SQLException {
-				
-				// build required fields
-				return null;
-			}
-		});
+	@SuppressWarnings("unchecked")
+	public Set<RssItem> getAllItems() {
+		Query query = session().createQuery("from RssItem");
+		Set<RssItem> result =  new HashSet<RssItem>(query.list());
+		return result;
 	}
 	
-	// creates a row in the items table of the database based on an RssItem object
-	public void create(RssItem item, int channelId) {
-		MapSqlParameterSource params = new MapSqlParameterSource();
-		params.addValue("title", item.getDescription());
-		params.addValue("link", item.getLink());
-		params.addValue("description", item.getDescription());
-		
-		params.addValue("channel_id", channelId);
-		params.addValue("pubdate", item.getPubDate());
-		params.addValue("category", item.getCategory());
-		params.addValue("guid", item.getGuid());
-		params.addValue("source", item.getSource());
-		// params.addValue("enclosure", item.getEnclosure());
-		params.addValue("author", item.getAuthor());
-		params.addValue("comments", item.getComments());
-		
-		jdbc.update("insert into items (title, link, description, channel_id, pubdate, category, guid, source, enclosure, author, comments)"
-				+ " values (:title, :link, :description, :channel_id, :pubdate, :category, :guid, :source, :enclosure, :author, :comments)", params);
+	public void saveItemToChannel(RssItem item, RssChannel channel) {
+		String id = channel.getLink();
+		Criteria crit = session().createCriteria(RssChannel.class);
+		crit.add(Restrictions.eq("link", id));
+		RssChannel c = (RssChannel) crit.uniqueResult();
+		item.setChannel(c);
+		session().save(item);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Set<RssItem> getItemsFromChannel(RssChannel channel) {
+		Criteria crit = session().createCriteria(RssItem.class);
+		crit.createAlias("channel", "c");
+		crit.add(Restrictions.eq("c.id", channel.getId()));
+		Set<RssItem> result =  new LinkedHashSet<RssItem>(crit.list());
+		return result;
 
 	}
-		
+	
+	@SuppressWarnings("unchecked")
+	public Set<RssItem> getItemsByTitle(String title) {
+		Criteria crit = session().createCriteria(RssItem.class);
+		crit.add(Restrictions.ilike("title", title, MatchMode.ANYWHERE));
+		Set<RssItem> result =  new HashSet<RssItem>(crit.list());
+		return result;
+	}
+
+			
 	public boolean exists(RssItem item) {
-		return false;
+		String id = item.getGlobalId();
+		Criteria crit = session().createCriteria(RssItem.class);
+		crit.add(Restrictions.eq("globalId", id));
+		RssItem ret = (RssItem) crit.uniqueResult();
+		return ret != null ? true : false;
 	}
-	
-	public boolean exists(RssChannel channel) {
-		return false;
-	}
-	
-
 
 
 }

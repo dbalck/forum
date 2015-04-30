@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
@@ -42,13 +43,14 @@ public class RssItem implements Article {
 	private int id;
 	
 	@Column(name="global_item_id")
-	private String global_id;
+	private String globalId;
 	
 	@ManyToOne
 	@JoinColumn(name="channel_id")
 	private RssChannel channel;
 	
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "item")
+	@OneToOne
+	@PrimaryKeyJoinColumn
 	private Enclosure enclosure;
 	
 	private int hash;
@@ -61,11 +63,11 @@ public class RssItem implements Article {
 		this.link = link;
 		
 		if (guid != null) {
-			global_id = guid;
+			globalId = guid;
 		} else if (link != null) {
-			global_id = link;
+			globalId = link;
 		} else if (title != null) {
-			global_id = title;
+			globalId = title;
 		} else {
 			throw new IllegalArgumentException("illegal nulls in RssItem's constructor");
 		}
@@ -205,6 +207,13 @@ public class RssItem implements Article {
 		return this.id;
 	}
 
+	public String getGlobalId() {
+		return globalId;
+	}
+
+	public void setGlobalId(String globalId) {
+		this.globalId = globalId;
+	}
 
 	@Override
 	public int hashCode() {
@@ -222,7 +231,7 @@ public class RssItem implements Article {
 			result = prime * result
 					+ ((enclosure == null) ? 0 : enclosure.hashCode());
 			result = prime * result
-					+ ((global_id == null) ? 0 : global_id.hashCode());
+					+ ((globalId == null) ? 0 : globalId.hashCode());
 			result = prime * result + ((guid == null) ? 0 : guid.hashCode());
 			result = prime * result + hash;
 			result = prime * result + ((link == null) ? 0 : link.hashCode());
@@ -243,10 +252,10 @@ public class RssItem implements Article {
 		if (getClass() != obj.getClass())
 			return false;
 		RssItem other = (RssItem) obj;
-		if (global_id == null) {
-			if (other.global_id != null)
+		if (globalId == null) {
+			if (other.getGlobalId() != null)
 				return false;
-		} else if (!global_id.equals(other.global_id))
+		} else if (!globalId.equals(other.getGlobalId()))
 			return false;
 		return true;
 	}
