@@ -65,6 +65,7 @@ public class AtomFeed implements Stream {
 	private String rights;
 	private String subtitle;
 	
+	// Not CascadeType.MERGE
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "feed")
 	private Set<AtomEntry> entries = new HashSet<AtomEntry>();
 	
@@ -273,14 +274,29 @@ public class AtomFeed implements Stream {
 	}
 
 	
+
 	@Override
 	public int hashCode() {
-		if (this.hash == 0) {
-			final int prime = 31;
-			int result = 1;
-			this.hash = prime * result + ((globalId == null) ? 0 : globalId.hashCode());
-		}
-		return this.hash;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((authors == null) ? 0 : authors.hashCode());
+		result = prime * result
+				+ ((categories == null) ? 0 : categories.hashCode());
+		result = prime * result
+				+ ((contributors == null) ? 0 : contributors.hashCode());
+		result = prime * result
+				+ ((generator == null) ? 0 : generator.hashCode());
+		result = prime * result
+				+ ((globalId == null) ? 0 : globalId.hashCode());
+		result = prime * result + ((icon == null) ? 0 : icon.hashCode());
+		result = prime * result + ((link == null) ? 0 : link.hashCode());
+		result = prime * result + ((logo == null) ? 0 : logo.hashCode());
+		result = prime * result + ((rights == null) ? 0 : rights.hashCode());
+		result = prime * result
+				+ ((subtitle == null) ? 0 : subtitle.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + (int) (updated ^ (updated >>> 32));
+		return result;
 	}
 
 	@Override
@@ -292,10 +308,62 @@ public class AtomFeed implements Stream {
 		if (getClass() != obj.getClass())
 			return false;
 		AtomFeed other = (AtomFeed) obj;
+		if (authors == null) {
+			if (other.authors != null)
+				return false;
+		} else if (!authors.equals(other.authors))
+			return false;
+		if (categories == null) {
+			if (other.categories != null)
+				return false;
+		} else if (!categories.equals(other.categories))
+			return false;
+		if (contributors == null) {
+			if (other.contributors != null)
+				return false;
+		} else if (!contributors.equals(other.contributors))
+			return false;
+		if (generator == null) {
+			if (other.generator != null)
+				return false;
+		} else if (!generator.equals(other.generator))
+			return false;
 		if (globalId == null) {
 			if (other.globalId != null)
 				return false;
-		} else if (!globalId.equals(other.getGlobalId()))
+		} else if (!globalId.equals(other.globalId))
+			return false;
+		if (icon == null) {
+			if (other.icon != null)
+				return false;
+		} else if (!icon.equals(other.icon))
+			return false;
+		if (link == null) {
+			if (other.link != null)
+				return false;
+		} else if (!link.equals(other.link))
+			return false;
+		if (logo == null) {
+			if (other.logo != null)
+				return false;
+		} else if (!logo.equals(other.logo))
+			return false;
+		if (rights == null) {
+			if (other.rights != null)
+				return false;
+		} else if (!rights.equals(other.rights))
+			return false;
+		if (subtitle == null) {
+			if (other.subtitle != null)
+				return false;
+		} else if (!subtitle.equals(other.subtitle))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		if (updated != other.updated)
 			return false;
 		return true;
 	}

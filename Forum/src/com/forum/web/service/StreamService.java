@@ -1,10 +1,12 @@
 package com.forum.web.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.forum.web.atom.AtomEntry;
 import com.forum.web.atom.AtomFeed;
 import com.forum.web.dao.ChannelDao;
 import com.forum.web.dao.EntryDao;
@@ -44,25 +46,79 @@ public class StreamService {
 		this.feedDao = feedDao;
 	}
 
-	// create feed, i.e. create channel and child objects (including items)
+	// create stream, i.e. create channel and child objects (including items)
+	public void createStream(Stream s) { 
+		// the stream is RSS
+		if (s.type() == StreamType.ATOM) {
+			AtomFeed feed = (AtomFeed) s;
+			AtomFeed pFeed = feedDao.getFeedById(feed.getGlobalId());
+			if (pFeed == null) {
+				// new feed, we can simple push the entire atom hierarchy into the db
+				feedDao.createFeed(feed);
+			} else {
+				// existing feed, check if it has the same update stamp as our persistent one
+				if (feed.getUpdated() != pFeed.getUpdated()) {
+					
+					// save the new entries to a separate place
+					Set<AtomEntry> entries = feed.getEntries();
+					
+					// add the new entries to the old feed
+					entryDao.addEntiresToFeed(entries, pFeed);
+
+					// now get a lazy reference to these combined entries and set it to the new feed
+					entries = pFeed.getEntries();
+					feed.setEntries(entries);
+					
+					// merges (ie replaces) all fields in the old feed
+					feedDao.mergeFeed(feed, pFeed);
+					
+					// then add (rather than replace) the entries here, which persists them
+					// entryDao.addEntiresToFeed(entries, pFeed);
+	
+				}
+				// otherwise we don't need to update, it's exactly the same as the last time we pulled it
+			}
+		// the Stream is Atom
+		} else {
+			RssChannel channel = (RssChannel) s;
+			RssChannel pChannel = channelDao.getChannelById(channel.getLink());
+			if (pChannel == null) {
+				// there was no preexisting channel with that link, create a new one
+				channelDao.createChannel(channel);
+			} else {
+				// since RSS channels don't require a field that specifies when they were last
+				// updated, we have to just update each time
+				
+				// save the new items separately for adding later
+				Set<RssItem> items = channel.getItems();
+				if (itemDao == null) {
+					System.out.println("itemdao is null");
+				} else {
+					System.out.println("itemdao is not null");
+				}
+
+				// add the new items to the old channel
+				itemDao.addItemsToChannel(items, pChannel);
+
+				// now get a lazy reference to these combined items and set it to the new feed
+				items = pChannel.getItems();
+				channel.setItems(items);
+				
+				// merges (ie replaces) all fields in the old feed
+				channelDao.mergeChannel(channel, pChannel);
+				
+				// then add (rather than replace) the entries here, which persists them
+				// itemDao.addItemsToChannel(items, pChannel);
+				
+			}
+		}
+
+	}
+
+	
 	public void createStreams(List<Stream> streams) {
 		for (Stream s: streams) {
-			// the stream is RSS
-			if (s.type() == StreamType.RSS) {
-				if (channelDao == null) {
-					System.out.println("channelDao is null");
-				} else {
-					channelDao.createChannel((RssChannel) s); 
-				}
-				
-			// the Stream is Atom
-			} else {
-				if (feedDao == null) {
-					System.out.println("feedDao is null");
-				} else {
-					feedDao.createFeed((AtomFeed) s); 
-				}
-			}
+			createStream(s);
 		} 
 	}
 	

@@ -40,6 +40,8 @@ public class ItemDaoTests {
 	private RssItem item2;
 	private RssItem item3;
 	private RssItem item4;
+	private RssItem item5;
+	private RssItem item6;
 	private Image image1;
 	private TextInput ti1;
 	private SkipDays sd1;
@@ -106,6 +108,8 @@ public class ItemDaoTests {
 		channel2.addTextInput(ti1);
 		channel2.addSkipDays(sd1);
 		
+		item5 = new RssItem("ninjas attack the white house", "example5.com", "The identity of the culprits is still unknown", null);
+		item6 = new RssItem("Senator admits to love affair with staffer", "example6.com", "Constituents report that they are unsurprised", null);
 		channel3 = new RssChannel("this is channel 3", "example3.com", "This is the third channel");
 	}
 	
@@ -135,7 +139,7 @@ public class ItemDaoTests {
 
 	@Test
 	public void testSaveItemToChannel() {
-		
+
 		channelDao.createChannel(channel1);
 		Set<RssItem> items = itemDao.getAllItems();
 		assertEquals("there should be a couple items saved in channel1", 2, items.size());
@@ -152,10 +156,74 @@ public class ItemDaoTests {
 		
 		channelDao.createChannel(channel2);
 		items = itemDao.getAllItems();
-		assertEquals("there should be four items saved in channel1", 5, items.size());
+		assertEquals("there should be four items saved in channel1 and another unique one in channel2", 5, items.size());
 
 		
 	}
+	
+	@Test
+	public void testGetItemsByTitle() {
+		channel3.addItem(item5);
+		channel3.addItem(item6);
+
+		channelDao.createChannel(channel1);
+		channelDao.createChannel(channel2);
+		channelDao.createChannel(channel3);
+
+		Set<RssItem> items = itemDao.getItemsByTitle("random nonexistent title");
+		assertEquals("there should be no items with the title 'random nonexistent title'", 0, items.size());
+
+		items = itemDao.getItemsByTitle("title1");
+		assertEquals("item1 should have that title", 1, items.size());
+		
+		items = itemDao.getItemsByTitle("title0");
+		assertEquals("no items should have that title", 0, items.size());
+		
+		items = itemDao.getItemsByTitle("ninjas attack");
+		assertEquals("items 3 & 5 should have that title", 2, items.size());
+		
+		items = itemDao.getItemsByTitle("");
+		assertEquals("empty string, all items should match", 6, items.size());
+
+
+		
+	}
+	
+	@Test
+	public void testGetItemsByAuthor() {
+		item1.setAuthor("burt");
+		item2.setAuthor("bob");
+		item3.setAuthor("bill");
+		item4.setAuthor("gary");
+		channelDao.createChannel(channel1);
+		channelDao.createChannel(channel2);
+		
+		Set<RssItem> items = itemDao.getItemsByAuthor("Dan");
+		assertEquals("there should be no items with the author 'Dan'", 0, items.size());
+		
+		items = itemDao.getItemsByAuthor("burt");
+		assertEquals("there should be one item with the author 'burt'", 1, items.size());
+		
+		
+		// check case insensitive
+		items = itemDao.getItemsByAuthor("Burt");
+		assertEquals("there should be one item with the author 'burt'", 1, items.size());
+
+		items = itemDao.getItemsByAuthor("bill");
+		assertEquals("there should be no items with the author 'bill'", 1, items.size());
+
+		// check b
+		items = itemDao.getItemsByAuthor("B");
+		assertEquals("there should be three items with the author starting with 'B'", 3, items.size());
+		
+		// check empty string -- should return all
+		items = itemDao.getItemsByAuthor("");
+		assertEquals("Empty string should match all four authors", 4, items.size());
+
+		
+
+	}
+
 
 	
 

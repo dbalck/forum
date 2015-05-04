@@ -40,10 +40,8 @@ public class ChannelDao {
 		crit.add(Restrictions.eq("link", id));
 		RssChannel ret = (RssChannel) crit.uniqueResult();
 		if (ret != null) {
-			System.out.println("channel exists, forgoing channel save");
 			return true;
 		} else {
-			System.out.println("channel doesn't exist, saving channel");
 			return false;
 		}
 	}
@@ -51,6 +49,10 @@ public class ChannelDao {
 	public void createChannel(RssChannel channel) {
 		if (!exists(channel)) {
 			session().save(channel);
+		} else {
+			String id = channel.getLink();
+			channel = getChannelById(id);
+			updateChannel(channel);
 		}
 	}
 	
@@ -93,7 +95,7 @@ public class ChannelDao {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Set<RssChannel> getFeedsByPersonName(String name) {
+	public Set<RssChannel> getChannelsByPersonName(String name) {
 		Criteria crit = session().createCriteria(RssChannel.class);
 		crit.add(Restrictions.or(
 				Restrictions.ilike("managingEditor", name, MatchMode.ANYWHERE), 
@@ -112,6 +114,11 @@ public class ChannelDao {
 	
 	public void deleteChannel(RssChannel channel) {
 		session().delete(channel);
+	}
+	
+	public void mergeChannel(RssChannel newChannel, RssChannel persistedChannel) {
+		newChannel.setId(persistedChannel.getId());
+		session().merge(newChannel);
 	}
 
 	

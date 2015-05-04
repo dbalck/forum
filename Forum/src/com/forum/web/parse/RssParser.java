@@ -392,7 +392,7 @@ public class RssParser extends Parser {
 								channel.setWebMaster((String) top.get("webMaster"));
 							}
 
-							channel.setItems(channelItems);
+							channel.addItems(channelItems);
 
 						}
 						top = null;

@@ -36,6 +36,7 @@
 				<list>
 					<value>com.forum.web.rss</value>
 					<value>com.forum.web.dao</value>
+					<value>com.forum.web.atom</value>
 				</list>
 			</property>
 		</bean>

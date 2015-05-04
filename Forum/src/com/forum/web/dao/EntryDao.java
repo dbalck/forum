@@ -42,6 +42,13 @@ public class EntryDao {
 		
 	}
 	
+	public void addEntiresToFeed(Set<AtomEntry> entries, AtomFeed feed) {		
+		for (AtomEntry entry: entries) {
+			this.createEntry(entry, feed);
+		}
+	}
+
+	
 	@SuppressWarnings("unchecked")
 	public Set<AtomEntry> getAllEntries() {
 		Query query = session().createQuery("from AtomEntry");
@@ -100,11 +107,6 @@ public class EntryDao {
 		return result;
 	}
 	
-	public void addEntiresToFeed(Set<AtomEntry> entries, AtomFeed feed) {		
-		for (AtomEntry entry: entries) {
-			this.createEntry(entry, feed);
-		}
-	}
 	
 	@SuppressWarnings("unchecked")
 	public Set<AtomEntry> getEntriesFromFeed(AtomFeed feed) {

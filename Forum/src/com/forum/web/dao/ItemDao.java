@@ -41,12 +41,26 @@ public class ItemDao {
 	}
 	
 	public void saveItemToChannel(RssItem item, RssChannel channel) {
+		// check to see if the channel already exists
 		String id = channel.getLink();
 		Criteria crit = session().createCriteria(RssChannel.class);
 		crit.add(Restrictions.eq("link", id));
 		RssChannel c = (RssChannel) crit.uniqueResult();
-		item.setChannel(c);
-		session().save(item);
+		
+		// if it does exist, see if the same item already exists
+		if (c != null) {
+			id = item.getGlobalId();
+			crit = session().createCriteria(RssItem.class);
+			crit.add(Restrictions.eq("globalId", id));
+			RssItem i = (RssItem) crit.uniqueResult();
+			// so if the item does not exist already exist, save it to said channel, 
+			// otherwise no need to add the item
+			if (i == null) {
+				item.setChannel(c);
+				session().save(item);
+			}
+			
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -75,6 +89,22 @@ public class ItemDao {
 		RssItem ret = (RssItem) crit.uniqueResult();
 		return ret != null ? true : false;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public Set<RssItem> getItemsByAuthor(String author) {
+		Criteria crit = session().createCriteria(RssItem.class);
+		crit.add(Restrictions.ilike("author", author, MatchMode.ANYWHERE));
+		Set<RssItem> result =  new HashSet<RssItem>(crit.list());
+		return result;
+
+	}
+		
+	public void addItemsToChannel(Set<RssItem> items, RssChannel channel) {		
+		for (RssItem item: items) {
+			this.saveItemToChannel(item, channel);
+		}
+	}
+
 
 
 }

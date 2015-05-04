@@ -1,7 +1,6 @@
 package com.forum.web.test.parse;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.forum.web.atom.AtomFeed;
 import com.forum.web.dao.ChannelDao;
 import com.forum.web.dao.FeedDao;
+import com.forum.web.parse.Article;
 import com.forum.web.parse.Parser;
 import com.forum.web.parse.Stream;
 import com.forum.web.parse.WebCrawler;
@@ -89,16 +89,27 @@ public class AtomParserTest {
 	}
 
 	@Test
-	public void testCreateFeed() {
+	public void testParseLinks() {
+		// create a list of streams that should have one atom and two rss feeds
 		List<Stream> streams = crawler.parseLinks();
+		assertEquals("there should be three streams", 3, streams.size());
+		
+		// there are 30 atom entries, and 40 rss items
+		int count = 0;
+		for (Stream s: streams) {
+			for (Article a: s.articles()) {
+				count++;
+			}
+		}
+		assertEquals("There should be a total of 70 articles (items or entries) in the three streams", 70, count);
+		
 		streamService.createStreams(streams);
-		System.out.println("done");
+//		System.out.println("done");
+		
 		// create a AtomFeed object with the same required fields as was used for the original feed
 		AtomFeed voxFeed = new AtomFeed("Vox -  All", "http://www.vox.com/rss/index.xml", Parser.parseDate("2015-04-09T12:10:02-04:00"));
 		AtomFeed fakeFeed = new AtomFeed("Fake", "http://www.vox.com/", Parser.parseDate("2015-04-09T12:10:02-04:00"));
 
-		assertTrue("There should be a database entry with that global id", feedDao.exists(voxFeed));
-		assertFalse("There should not be a database entry with that made-up global id", feedDao.exists(fakeFeed));
 
 	}
 	

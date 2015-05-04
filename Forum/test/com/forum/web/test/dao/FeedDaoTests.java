@@ -293,7 +293,6 @@ public class FeedDaoTests {
 
 	@Test
 	public void testGetFeedsByTitle() {
-		jdbc.execute("delete from feeds"); // clear table
 		feedDao.createFeed(feed1);
 
 		Set<AtomFeed> rFeed = feedDao.getFeedsByTitle("something");
@@ -313,5 +312,15 @@ public class FeedDaoTests {
 
 	}
 
+	@Test
+	public void testMergeFeed() {
+		// create a feed with a couple entries
+		feedDao.createFeed(feed1);
+		
+		// create a new feed with the same global id as feed1, and add a feed to it
+		AtomFeed tempFeed = new AtomFeed("Title of feed1", "yahoo.com/feed1a", date1);
+		
+
+	}
 
 }

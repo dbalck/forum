@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.forum.web.atom.AtomEntry;
 import com.forum.web.atom.AtomFeed;
 
 @Transactional
@@ -97,6 +98,13 @@ public class FeedDao {
 		return result;
 
 	}	
+	
+	// old feed is a managed object, new feed is a detached object
+	public void mergeFeed(AtomFeed newFeed, AtomFeed persistedFeed) {
+		newFeed.setId(persistedFeed.getId());
+		session().merge(newFeed);
+		
+	}
 
 	
 }
