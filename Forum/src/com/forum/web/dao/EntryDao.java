@@ -32,9 +32,24 @@ public class EntryDao {
 		System.out.println("entryDao is live");
 	}
 	
-	public void createEntry(AtomEntry entry, AtomFeed feed) throws NullPointerException {
-		if (entry == null || feed == null) {
-			throw new NullPointerException(" null entry or feed");
+	public void createEntry(AtomEntry entry, AtomFeed feed) {
+		// first get a managed instance of the feed, if there is one
+		String id = feed.getGlobalId();
+		Criteria crit = session().createCriteria(AtomFeed.class);
+		crit.add(Restrictions.eq("globalId", id));
+		feed = (AtomFeed) crit.uniqueResult();
+		// if there's a feed
+		if (feed != null) {
+			// now check whether there's already an entry in it with our parameter's identity
+			id = entry.getGlobalId();
+			crit = session().createCriteria(AtomEntry.class);
+			crit.add(Restrictions.eq("globalId", id));
+			AtomEntry e = (AtomEntry) crit.uniqueResult();
+			// if the entry is null, then it doesn't exist for the feed yet -- add it
+			if (e == null) {
+				entry.addFeed(feed);
+				session().save(entry);
+			}
 		}
 		
 		feed.addEntry(entry);

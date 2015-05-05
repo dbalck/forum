@@ -316,12 +316,35 @@ public class RssChannel implements Stream {
 		this.skipDays = days;
 	}
 
-
+	
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((category == null) ? 0 : category.hashCode());
+		result = prime * result + ((cloud == null) ? 0 : cloud.hashCode());
+		result = prime * result
+				+ ((copyright == null) ? 0 : copyright.hashCode());
+		result = prime * result
+				+ ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((docs == null) ? 0 : docs.hashCode());
+		result = prime * result
+				+ ((generator == null) ? 0 : generator.hashCode());
+		result = prime * result
+				+ ((language == null) ? 0 : language.hashCode());
+		result = prime * result
+				+ (int) (lastBuildDate ^ (lastBuildDate >>> 32));
 		result = prime * result + ((link == null) ? 0 : link.hashCode());
+		result = prime * result
+				+ ((managingEditor == null) ? 0 : managingEditor.hashCode());
+		result = prime * result + (int) (pubDate ^ (pubDate >>> 32));
+		result = prime * result + ((rating == null) ? 0 : rating.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ttl;
+		result = prime * result
+				+ ((webMaster == null) ? 0 : webMaster.hashCode());
 		return result;
 	}
 
@@ -334,10 +357,71 @@ public class RssChannel implements Stream {
 		if (getClass() != obj.getClass())
 			return false;
 		RssChannel other = (RssChannel) obj;
+		if (category == null) {
+			if (other.category != null)
+				return false;
+		} else if (!category.equals(other.category))
+			return false;
+		if (cloud == null) {
+			if (other.cloud != null)
+				return false;
+		} else if (!cloud.equals(other.cloud))
+			return false;
+		if (copyright == null) {
+			if (other.copyright != null)
+				return false;
+		} else if (!copyright.equals(other.copyright))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (docs == null) {
+			if (other.docs != null)
+				return false;
+		} else if (!docs.equals(other.docs))
+			return false;
+		if (generator == null) {
+			if (other.generator != null)
+				return false;
+		} else if (!generator.equals(other.generator))
+			return false;
+		if (language == null) {
+			if (other.language != null)
+				return false;
+		} else if (!language.equals(other.language))
+			return false;
+		if (lastBuildDate != other.lastBuildDate)
+			return false;
 		if (link == null) {
 			if (other.link != null)
 				return false;
-		} else if (!link.equals(other.getLink()))
+		} else if (!link.equals(other.link))
+			return false;
+		if (managingEditor == null) {
+			if (other.managingEditor != null)
+				return false;
+		} else if (!managingEditor.equals(other.managingEditor))
+			return false;
+		if (pubDate != other.pubDate)
+			return false;
+		if (rating == null) {
+			if (other.rating != null)
+				return false;
+		} else if (!rating.equals(other.rating))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		if (ttl != other.ttl)
+			return false;
+		if (webMaster == null) {
+			if (other.webMaster != null)
+				return false;
+		} else if (!webMaster.equals(other.webMaster))
 			return false;
 		return true;
 	}

@@ -26,7 +26,6 @@ import com.forum.web.parse.Stream;
 import com.forum.web.parse.StreamType;
 
 @Entity
-@Immutable
 @Table(name="feeds")
 public class AtomFeed implements Stream {
 	
@@ -113,8 +112,7 @@ public class AtomFeed implements Stream {
 		return authors;
 	}
 
-	@SuppressWarnings("unused")
-	private void setAuthors(Set<Author> authors) {
+	public void setAuthors(Set<Author> authors) {
 		this.authors = authors;
 	}
 
@@ -273,17 +271,10 @@ public class AtomFeed implements Stream {
 		this.contributors.addAll(contributors);
 	}
 
-	
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((authors == null) ? 0 : authors.hashCode());
-		result = prime * result
-				+ ((categories == null) ? 0 : categories.hashCode());
-		result = prime * result
-				+ ((contributors == null) ? 0 : contributors.hashCode());
 		result = prime * result
 				+ ((generator == null) ? 0 : generator.hashCode());
 		result = prime * result
@@ -308,21 +299,6 @@ public class AtomFeed implements Stream {
 		if (getClass() != obj.getClass())
 			return false;
 		AtomFeed other = (AtomFeed) obj;
-		if (authors == null) {
-			if (other.authors != null)
-				return false;
-		} else if (!authors.equals(other.authors))
-			return false;
-		if (categories == null) {
-			if (other.categories != null)
-				return false;
-		} else if (!categories.equals(other.categories))
-			return false;
-		if (contributors == null) {
-			if (other.contributors != null)
-				return false;
-		} else if (!contributors.equals(other.contributors))
-			return false;
 		if (generator == null) {
 			if (other.generator != null)
 				return false;

@@ -48,7 +48,7 @@ public class StreamService {
 
 	// create stream, i.e. create channel and child objects (including items)
 	public void createStream(Stream s) { 
-		// the stream is RSS
+		// the stream is ATOM
 		if (s.type() == StreamType.ATOM) {
 			AtomFeed feed = (AtomFeed) s;
 			AtomFeed pFeed = feedDao.getFeedById(feed.getGlobalId());
@@ -56,8 +56,8 @@ public class StreamService {
 				// new feed, we can simple push the entire atom hierarchy into the db
 				feedDao.createFeed(feed);
 			} else {
-				// existing feed, check if it has the same update stamp as our persistent one
-				if (feed.getUpdated() != pFeed.getUpdated()) {
+				// existing feed, check if it has the same fields (logically equal) as our persistent one
+				if (!feed.equals(pFeed)) {
 					
 					// save the new entries to a separate place
 					Set<AtomEntry> entries = feed.getEntries();
@@ -67,7 +67,10 @@ public class StreamService {
 
 					// now get a lazy reference to these combined entries and set it to the new feed
 					entries = pFeed.getEntries();
+					feed.setContributors(pFeed.getContributors());
+					feed.setCategories(pFeed.getCategories());
 					feed.setEntries(entries);
+					feed.setAuthors(pFeed.getAuthors());
 					
 					// merges (ie replaces) all fields in the old feed
 					feedDao.mergeFeed(feed, pFeed);
@@ -91,11 +94,6 @@ public class StreamService {
 				
 				// save the new items separately for adding later
 				Set<RssItem> items = channel.getItems();
-				if (itemDao == null) {
-					System.out.println("itemdao is null");
-				} else {
-					System.out.println("itemdao is not null");
-				}
 
 				// add the new items to the old channel
 				itemDao.addItemsToChannel(items, pChannel);
@@ -103,7 +101,9 @@ public class StreamService {
 				// now get a lazy reference to these combined items and set it to the new feed
 				items = pChannel.getItems();
 				channel.setItems(items);
-				
+				channel.setImage(pChannel.getImage());
+				channel.setTextInput(pChannel.getTextInput());
+
 				// merges (ie replaces) all fields in the old feed
 				channelDao.mergeChannel(channel, pChannel);
 				

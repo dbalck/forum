@@ -51,8 +51,8 @@ public class ChannelDao {
 			session().save(channel);
 		} else {
 			String id = channel.getLink();
-			channel = getChannelById(id);
-			updateChannel(channel);
+			RssChannel oldChannel = getChannelById(id);
+			mergeChannel(channel, oldChannel);
 		}
 	}
 	

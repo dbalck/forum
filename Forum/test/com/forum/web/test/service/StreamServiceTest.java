@@ -1,6 +1,6 @@
 package com.forum.web.test.service;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -197,25 +197,65 @@ public class StreamServiceTest {
 		streamService.setEntryDao(entryDao);
 
 		streamService.createStreams(streams);
-		
-		// create a detatched copy of a stream (channel1), and cast as a stream
-		RssChannel tempChannel = new RssChannel("Anti-Tank - R - US", "example1.com", "Your most reliable source for Anti-tank-weapon-news");
+		Set<RssItem> items = itemDao.getAllItems();
+		Set<AtomEntry> entries = entryDao.getAllEntries();
+		Set<RssChannel> channels = channelDao.getAllChannels();
+		Set<AtomFeed> feeds = feedDao.getAllFeeds();
+
+		// check that the channels and items were inserted
+		assertEquals("There should be four items for two channels", 4, items.size());
+		assertEquals("There should be four items for two channels", 2, channels.size());
+		assertTrue("There should be channel1", channels.contains(channel1));
+		assertTrue("There should be channel2", channels.contains(channel2));
+
+		// check that the feeds and entries were inserted
+		assertEquals("There should be three entires for two feeds", 3, entries.size());
+		assertEquals("two feeds, but three more feeds that are sources", 5, feeds.size());
+		assertTrue("There should be feed1", feeds.contains(feed1));
+		assertTrue("There should be feed2", feeds.contains(feed2));
+
+		// create a detatched copy of a stream (channel1, i.e. uses the same example1.com link, the business key), 
+		// and cast as a stream, but with a different title and description
+		RssChannel tempChannel = new RssChannel("This is the new title for example1.com!", "example1.com", "Hu? Wen?");
 		
 		// create a copy of an item and an entirely new item, and give it to the new channel
 		RssItem tempItem1 = new RssItem("title1", "example1.com", "this is the first item", null);
 		RssItem tempItem2 = new RssItem("titleA", "exampleA.com", "this is the A item", null);
-
+		
+		// create a detatched copy of a stream (feed1, i.e. uses the same globalId, the business key), 
+		// and cast as a stream, but with a different title and a random timestamp
+		AtomFeed tempFeed = new AtomFeed("This is the new title for feed1!", "yahoo.com/feed1a", 1000000);
+		
+		// create a copy of an item and an entirely new item, and give it to the new channel
+		AtomEntry tempEntry1 = new AtomEntry("Entry Title 1", "entry1111.com/entry1", date1);
+		AtomEntry tempEntry2 = new AtomEntry("Entry Title A", "entryAAAA.com/entryA", date1);
+	
 		// add them to the channel, which now has a stale and new item. 
 		tempChannel.addItem(tempItem1);
 		tempChannel.addItem(tempItem2);
 		
+		tempFeed.addEntry(tempEntry1);
+		tempFeed.addEntry(tempEntry2);
+
 		// test to see if the new item is added, and then stale item isn't
 		streamService.createStream((Stream) tempChannel);
+		streamService.createStream((Stream) tempFeed);
 
-
+		items = itemDao.getAllItems();
+		channels = channelDao.getAllChannels();
+		assertEquals("There should be five items for two channels, title1 should only be there once  and titleA is new", 5, items.size());
+		assertEquals("There should be still only two channels, although example1.com should have new title and description fields", 2, channels.size());
+		assertFalse("There should NOT be the original channel1, it was changed", channels.contains(channel1));
+		assertTrue("Instead there should be the new title (tempChannel) and channel2", channels.contains(tempChannel));
+		assertTrue("There should be channel2", channels.contains(channel2));
 		
-		assertTrue("dummy test", true);
-	
+		entries = entryDao.getAllEntries();
+		feeds = feedDao.getAllFeeds();
+		assertEquals("There should be four entries, with Entry Title A being new (Entry Title 1 was ignored for insertion)", 4, entries.size());
+		assertEquals("There should be still only 5 feeds -- three sources and the original two feeds", 5, feeds.size());
+		assertFalse("There should NOT be a feed1 -- an altered version was inserted/merged to its id", feeds.contains(feed1));
+		assertTrue("There should be a new (ish) feed1 with the new title and timestamp", feeds.contains(tempFeed));
+		assertTrue("There should still be that feed2 though", feeds.contains(feed2));
 
 	}
 	
