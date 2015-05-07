@@ -12,11 +12,13 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.forum.web.atom.AtomEntry;
 import com.forum.web.atom.AtomFeed;
 
+@Repository
 @Transactional
 @Component("entryDao")
 public class EntryDao {

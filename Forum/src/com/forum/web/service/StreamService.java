@@ -1,5 +1,6 @@
 package com.forum.web.service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -130,6 +131,26 @@ public class StreamService {
 	// update channel
 	public void updateStream(RssChannel channel, int channelId) {
 		
+	}
+	
+	// get all the streams (for testing)
+	public Set<Stream> getAllStreams() {
+		Set<RssChannel> channels = channelDao.getAllChannels();
+		Set<AtomFeed> feeds = feedDao.getAllFeeds();
+		Set<Stream> streams = new HashSet<Stream>();
+		streams.addAll(channels);
+		streams.addAll(feeds);
+		return streams;
+	}
+	
+	// get all the articles (for testing)
+	public Set<Article> getAllArticles() {
+		Set<RssItem> items = itemDao.getAllItems();
+		Set<AtomEntry> entries = entryDao.getAllEntries();
+		Set<Article> articles = new HashSet<Article>();
+		articles.addAll(items);
+		articles.addAll(entries);
+		return articles;
 	}
 	
 	// delete channel and child objects (including items)

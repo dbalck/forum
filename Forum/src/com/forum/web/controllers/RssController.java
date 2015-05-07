@@ -35,11 +35,4 @@ public class RssController {
 		return singleton;
 		
 	}
-	
-
-	public static void main(String[] args) {
-		RssController rscontroller = RssController.getInstance();
-
-	}
-
 }

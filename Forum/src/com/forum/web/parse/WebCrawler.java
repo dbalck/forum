@@ -43,23 +43,28 @@ public class WebCrawler {
 		List<Stream> streams = new ArrayList<Stream>();
 
 		try {
-			for (String link : rssLinks) {
-				URL url = getUrl(link);
-				InputStream input = getInput(url);
-				streams.add(rssParser.parseLink(input));
+			if (rssLinks != null) {
+				for (String link : rssLinks) {
+					URL url = getUrl(link);
+					InputStream input = getInput(url);
+					streams.add(rssParser.parseLink(input));
+				}
+
 			}
-			
-			for (String link : atomLinks) {
-				URL url = getUrl(link);
-				InputStream input = getInput(url);
-				streams.add(atomParser.parseLink(input));
+
+			if (atomLinks != null) {
+				for (String link : atomLinks) {
+					URL url = getUrl(link);
+					InputStream input = getInput(url);
+					streams.add(atomParser.parseLink(input));
+				}
+
 			}
 
 
 		} catch (MalformedURLException e) {
 			System.out.println("error trying to read that url");
 			System.out.println(e);
-			System.exit(1);
 
 		} 
 		return streams;
