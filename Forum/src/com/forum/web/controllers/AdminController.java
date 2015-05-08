@@ -25,17 +25,17 @@ public class AdminController {
 		this.streamService = streamService;
 	}
 
-	@RequestMapping("admin")
+	@RequestMapping("/admin")
 	public String showAdmin() {
 		return "admin";
 	}
 	
-	@RequestMapping("fetchrss")
+	@RequestMapping("/fetchrss")
 	public String fetchRss() {		
 		return "fetchrss";
 	}
 	
-	@RequestMapping(value="dofetch", method=RequestMethod.POST)
+	@RequestMapping(value="/dofetch", method=RequestMethod.POST)
 	public String doFetch(Model model, @RequestParam("url") String url, @RequestParam("type") String type) {
 		WebCrawler wc = null;
 		List<String> links = new ArrayList<String>();

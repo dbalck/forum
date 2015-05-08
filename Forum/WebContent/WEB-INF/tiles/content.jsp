@@ -2,36 +2,44 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="author" content="Forum">
-<link href="${pageContext.request.contextPath}/static/css/main.css"
-	rel="stylesheet" type="text/css" />
-<link rel="stylesheet"
-	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<h2>Streams</h2>
+<table class="table table-striped">
+	<thead>
+		<tr class="row">
+			<th class="col-sm-4">Title</th>
+			<th class="col-sm-4">Last Updated</th>
+			<th class="col-sm-4">Link</th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach var="row" items="${streams}">
+			<tr class="row">
+				<td class="col-sm-4">${row.title()}</td>
+				<td class="col-sm-4">${row.date()}</td>
+				<td class="col-sm-4">${row.link()}</td>
+			</tr>
+		</c:forEach>
+	</tbody>
+</table>
+<h2>Articles</h2>
+<table class="table table-striped">
+	<thead>
+		<tr class="row">
+			<th class="col-sm-4">Title</th>
+			<th class="col-sm-4">Date</th>
+			<th class="col-sm-4">Link</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach var="row" items="${articles}">
+			<tr class="row">
+				<td class="col-sm-4">${row.title()}</td>
+				<td class="col-sm-4">${row.date()}</td>
+				<td class="col-sm-4">${row.link()}</td>
+			</tr>
+		</c:forEach>
+	</tbody>
+</table>
 
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/static/script/jquery-1.11.2.min.js"></script>
-</head>
-<body>
-	<c:forEach var="row" items="${streams}">
-	Stream Title: ${row.title()}<br />
-	Stream timestamp: ${row.date()}<br />
-		<br />
-	</c:forEach>
-
-	<c:forEach var="row" items="${articles}">
-	Article Title: ${row.title()}<br />
-	Article timestamp: ${row.date()}<br />
-		<br />
-	</c:forEach>
-	<form method="post"
-		action="${pageContext.request.contextPath}/fetchrss">
-		<input value="fetch feeds" type="submit" class="btn"></input>
-	</form>
-	<br/>
-</body>
-
-</html>
+<br />

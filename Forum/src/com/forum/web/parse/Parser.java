@@ -29,7 +29,7 @@ public abstract class Parser {
 	
 	public static String buildDate(long timestamp) {
 		Date d = new Date(timestamp);
-		return new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z").format(d);
+		return new SimpleDateFormat("dd MMM, yyyy HH:mm Z").format(d);
 	}
 	
 	public abstract Stream parseLink(InputStream stream); 
