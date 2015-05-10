@@ -9,10 +9,7 @@
 				<p class="text-center">A database of ideas</p>
 			</td>
 			<td class="text-right col-sm-4">
-				<form method="post"
-					action="${pageContext.request.contextPath}/fetchrss">
-					<input value="Admin" type="submit" class="btn btn-primary"></input>
-				</form>
+				<a class="btn btn-primary" href="${pageContext.request.contextPath}/fetchrss">Admin</a>
 			</td>
 
 		</tr>

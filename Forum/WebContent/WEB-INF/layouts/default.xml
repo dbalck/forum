@@ -23,6 +23,14 @@
 		<put-attribute name="content" value="/WEB-INF/tiles/rssfetched.jsp"></put-attribute>
 		<put-attribute name="footer" value="/WEB-INF/tiles/footer.jsp"></put-attribute>
 	</definition>
+	
+		<definition name="login" template="/WEB-INF/templates/default.jsp">
+		<put-attribute name="title" value="Forum: Your economics blog feed"></put-attribute>
+		<put-attribute name="header" value="/WEB-INF/tiles/header.jsp"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/tiles/login.jsp"></put-attribute>
+		<put-attribute name="footer" value="/WEB-INF/tiles/footer.jsp"></put-attribute>
+	</definition>
+	
 
 
 </tiles-definitions>

@@ -17,7 +17,6 @@ import com.forum.web.service.StreamService;
 @Controller
 public class AdminController {
 
-	
 	private StreamService streamService;
 	
 	@Autowired
