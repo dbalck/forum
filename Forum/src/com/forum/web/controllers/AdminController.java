@@ -20,7 +20,7 @@ public class AdminController {
 	private StreamService streamService;
 	
 	@Autowired
-	public void setFeedService(StreamService streamService) {
+	public void setStreamService(StreamService streamService) {
 		this.streamService = streamService;
 	}
 
