@@ -27,9 +27,8 @@ import com.forum.web.rss.SkipDays;
 import com.forum.web.rss.TextInput;
 
 @ActiveProfiles("dev")
-@ContextConfiguration(locations={"classpath:com/forum/web/config/dao-context.xml", 
-		"classpath:com/forum/web/test/config/datasource.xml",
-		"classpath:com/forum/web/config/dao-context.xml"})
+@ContextConfiguration(locations={"classpath:com/forum/web/test/config/dao-context.xml", 
+		"classpath:com/forum/web/test/config/datasource.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ChannelDaoTests {
 	
@@ -94,13 +93,11 @@ public class ChannelDaoTests {
 		channel1.addItems(items1);
 		channel1.addImage(image1);
 		channel1.addTextInput(ti1);
-		channel1.addSkipDays(sd1);
 		
 		channel2 = new RssChannel("All puppies, all the time", "example2.com", "This is the second channel");
 		channel2.addItems(items2);
 		channel2.addImage(image1);
 		channel2.addTextInput(ti1);
-		channel2.addSkipDays(sd1);
 		
 		channel3 = new RssChannel("this is channel 3", "example3.com", "This is the third channel");
 

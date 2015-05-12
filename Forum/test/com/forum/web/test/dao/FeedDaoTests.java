@@ -32,10 +32,8 @@ import com.forum.web.parse.Parser;
 // vox.xml is the atom feed
 
 @ActiveProfiles("dev")
-@ContextConfiguration(locations={"classpath:com/forum/web/config/dao-context.xml", 
-		"classpath:com/forum/web/test/config/datasource.xml",
-		"classpath:com/forum/web/config/dao-context.xml",
-		"classpath:com/forum/web/config/service-context.xml"})
+@ContextConfiguration(locations={"classpath:com/forum/web/test/config/dao-context.xml", 
+		"classpath:com/forum/web/test/config/datasource.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FeedDaoTests {
 	

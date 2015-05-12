@@ -338,10 +338,10 @@ public class RssParser extends Parser {
 							if (top.containsKey("skipHours")) {
 								channel.setSkipHours((ArrayList<Integer>) top.get("skipHours"));
 							}
-							*/
+							
 							if (top.containsKey("skipDays")) {
 								channel.setSkipDays(new SkipDays((ArrayList<String>) top.get("skipDays")));
-							}
+							} */
 							
 							if (top.containsKey("language")) {
 								channel.setLanguage((String) top.get("language"));

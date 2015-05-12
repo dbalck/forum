@@ -28,8 +28,7 @@ import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
 @EnableTransactionManagement
 @ComponentScan({ "com.forum.web.*" })
 @Import({ SecurityConfig.class })
-@ImportResource({ "classpath:com/forum/web/config/dao-context.xml",
-		"classpath:com/forum/web/config/service-context.xml" })
+@ImportResource({"classpath:com/forum/web/config/service-context.xml" })
 public class ForumConfig extends WebMvcConfigurerAdapter {
 
 	@Bean
@@ -50,7 +49,7 @@ public class ForumConfig extends WebMvcConfigurerAdapter {
 		AnnotationSessionFactoryBean sessionFactory = new AnnotationSessionFactoryBean();
 		sessionFactory.setDataSource(dataSource());
 		sessionFactory
-				.setPackagesToScan(new String[] { "com.forum.web.dao", "com.forum.web.rss", "com.forum.web.atom" });
+				.setPackagesToScan(new String[] { "com.forum.web.dao", "com.forum.web.rss", "com.forum.web.atom", "com.forum.web.user" });
 		sessionFactory.setHibernateProperties(hibernateProperties());
 
 		return sessionFactory;

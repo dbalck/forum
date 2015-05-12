@@ -15,10 +15,11 @@ public class User {
 	private String username;
 	private String name;
 	private String authority;
-	private boolean enabled;
+	private boolean enabled = false;
 	private String password;
 	private String email;
 		
 	public User() {}
+	
 	
 }

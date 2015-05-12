@@ -37,11 +37,7 @@ public class RssChannel implements Stream {
 	@OneToOne
 	@JoinColumn(name="channel_id")
 	private Image image;
-	
-	@OneToOne
-	@PrimaryKeyJoinColumn
-	private SkipDays skipDays;
-	
+		
 	@OneToOne
 	@PrimaryKeyJoinColumn
 	private TextInput textInput;
@@ -105,22 +101,6 @@ public class RssChannel implements Stream {
 
 	public void setItems(Set<RssItem> items) {
 		this.items = items;
-	}
-
-//	public List<Integer> getSkipHours() {
-//		return skipHours;
-//	}
-//
-//	public void setSkipHours(List<Integer> skipHours) {
-//		this.skipHours = skipHours;
-//	}
-
-	public SkipDays getSkipDays() {
-		return skipDays;
-	}
-
-	public void setSkipDays(SkipDays skipDays) {
-		this.skipDays = skipDays;
 	}
 
 	public Image getImage() {
@@ -309,14 +289,7 @@ public class RssChannel implements Stream {
 	public void addImage(Image image) {
 		image.setChannel(this);
 		this.image = image;
-	}
-
-	public void addSkipDays(SkipDays days) {
-		days.setChannel(this);
-		this.skipDays = days;
-	}
-
-	
+	}	
 	
 	@Override
 	public int hashCode() {
@@ -430,7 +403,7 @@ public class RssChannel implements Stream {
 	public String toString() {
 		return "RssChannel [title=" + title + ", link=" + link
 				+ ", description=" + description + ", items=" + items
-				+ ", skipDays=" + skipDays + ", image=" + image
+			    + ", image=" + image
 				+ ", textInput=" + textInput + ", id=" + id + ", pubDate="
 				+ pubDate + ", lastBuildDate=" + lastBuildDate + ", language="
 				+ language + ", category=" + category + ", cloud=" + cloud

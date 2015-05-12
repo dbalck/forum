@@ -2,24 +2,10 @@ package com.forum.web.rss;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-@Entity
-@Table(name="skipdays")
 public class SkipDays {
 
-	@Id
-	@Column(name="skipdays_id")
-	@GeneratedValue
 	private int id;
 	
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "skipDays")
 	private RssChannel channel;
 	
 	private int hash;

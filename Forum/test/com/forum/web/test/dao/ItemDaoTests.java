@@ -1,6 +1,6 @@
 package com.forum.web.test.dao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,13 +24,11 @@ import com.forum.web.rss.Enclosure;
 import com.forum.web.rss.Image;
 import com.forum.web.rss.RssChannel;
 import com.forum.web.rss.RssItem;
-import com.forum.web.rss.SkipDays;
 import com.forum.web.rss.TextInput;
 
 @ActiveProfiles("dev")
-@ContextConfiguration(locations={"classpath:com/forum/web/config/dao-context.xml", 
-		"classpath:com/forum/web/test/config/datasource.xml",
-		"classpath:com/forum/web/config/dao-context.xml"})
+@ContextConfiguration(locations={"classpath:com/forum/web/test/config/dao-context.xml", 
+		"classpath:com/forum/web/test/config/datasource.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ItemDaoTests {
 
@@ -44,7 +42,6 @@ public class ItemDaoTests {
 	private RssItem item6;
 	private Image image1;
 	private TextInput ti1;
-	private SkipDays sd1;
 	private RssChannel channel1;
 	private RssChannel channel2;
 	private RssChannel channel3;
@@ -94,19 +91,16 @@ public class ItemDaoTests {
 		List<String> days = new ArrayList<String>();
 		days.add("monday");
 		days.add("tuesday");
-		sd1 = new SkipDays(days);
 		
 		channel1 = new RssChannel("Anti-Tank - R - US", "example1.com", "Your most reliable source for Anti-tank-weapon-news");
 		channel1.addItems(items1);
 		channel1.addImage(image1);
 		channel1.addTextInput(ti1);
-		channel1.addSkipDays(sd1);
 		
 		channel2 = new RssChannel("All puppies, all the time", "example2.com", "This is the second channel");
 		channel2.addItems(items2);
 		channel2.addImage(image1);
 		channel2.addTextInput(ti1);
-		channel2.addSkipDays(sd1);
 		
 		item5 = new RssItem("ninjas attack the white house", "example5.com", "The identity of the culprits is still unknown", null);
 		item6 = new RssItem("Senator admits to love affair with staffer", "example6.com", "Constituents report that they are unsurprised", null);

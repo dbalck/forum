@@ -120,6 +120,10 @@ public class ChannelDao {
 	
 	public void mergeChannel(RssChannel newChannel, RssChannel persistedChannel) {
 		newChannel.setId(persistedChannel.getId());
+		newChannel.setItems(persistedChannel.getItems());
+		newChannel.setImage(persistedChannel.getImage());
+		newChannel.setTextInput(persistedChannel.getTextInput());
+		
 		session().merge(newChannel);
 	}
 

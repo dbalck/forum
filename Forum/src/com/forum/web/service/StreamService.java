@@ -65,13 +65,6 @@ public class StreamService {
 					
 					// add the new entries to the old feed
 					entryDao.addEntiresToFeed(entries, pFeed);
-
-					// now get a lazy reference to these combined entries and set it to the new feed
-					entries = pFeed.getEntries();
-					feed.setContributors(pFeed.getContributors());
-					feed.setCategories(pFeed.getCategories());
-					feed.setEntries(entries);
-					feed.setAuthors(pFeed.getAuthors());
 					
 					// merges (ie replaces) all fields in the old feed
 					feedDao.mergeFeed(feed, pFeed);
@@ -98,12 +91,6 @@ public class StreamService {
 
 				// add the new items to the old channel
 				itemDao.addItemsToChannel(items, pChannel);
-
-				// now get a lazy reference to these combined items and set it to the new feed
-				items = pChannel.getItems();
-				channel.setItems(items);
-				channel.setImage(pChannel.getImage());
-				channel.setTextInput(pChannel.getTextInput());
 
 				// merges (ie replaces) all fields in the old feed
 				channelDao.mergeChannel(channel, pChannel);
