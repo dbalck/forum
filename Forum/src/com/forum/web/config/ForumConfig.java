@@ -81,8 +81,8 @@ public class ForumConfig extends WebMvcConfigurerAdapter {
 	
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/resources/")
-				.addResourceLocations("/static/**").setCachePeriod(31556926);
+		registry.addResourceHandler("/static/**")
+				.addResourceLocations("/resources/");
 	}
 
 }
