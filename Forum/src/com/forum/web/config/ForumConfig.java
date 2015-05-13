@@ -1,12 +1,9 @@
 package com.forum.web.config;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +11,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
-import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -28,7 +24,6 @@ import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
 @EnableTransactionManagement
 @ComponentScan({ "com.forum.web.*" })
 @Import({ SecurityConfig.class })
-@ImportResource({"classpath:com/forum/web/config/service-context.xml" })
 public class ForumConfig extends WebMvcConfigurerAdapter {
 
 	@Bean
@@ -49,9 +44,12 @@ public class ForumConfig extends WebMvcConfigurerAdapter {
 		AnnotationSessionFactoryBean sessionFactory = new AnnotationSessionFactoryBean();
 		sessionFactory.setDataSource(dataSource());
 		sessionFactory
-				.setPackagesToScan(new String[] { "com.forum.web.dao", "com.forum.web.rss", "com.forum.web.atom", "com.forum.web.user" });
+				.setPackagesToScan(new String[] { 
+						"com.forum.web.dao", 
+						"com.forum.web.rss", 
+						"com.forum.web.atom", 
+						"com.forum.web.user" });
 		sessionFactory.setHibernateProperties(hibernateProperties());
-
 		return sessionFactory;
 	}
 	

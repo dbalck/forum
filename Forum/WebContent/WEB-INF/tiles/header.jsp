@@ -1,3 +1,6 @@
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+
 <header>
 	<table>
 		<tr class="row">
@@ -8,10 +11,17 @@
 			<td class="col-sm-4">
 				<p class="text-center">A database of ideas</p>
 			</td>
-			<td class="text-right col-sm-4">
-				<a class="btn btn-primary" href="${pageContext.request.contextPath}/fetchrss">Admin</a>
-			</td>
 
+
+			<sec:authorize access="!isAuthenticated()">
+				<td class="text-right col-sm-4"><a class="btn btn-primary"
+					href="${pageContext.request.contextPath}/login">Login</a></td>
+			</sec:authorize>
+
+			<sec:authorize access="isAuthenticated()">
+				<td class="text-right col-sm-4"><a class="btn btn-primary"
+					href="j_spring_security_logout">Logout</a></td>
+			</sec:authorize>
 		</tr>
 	</table>
 </header>
