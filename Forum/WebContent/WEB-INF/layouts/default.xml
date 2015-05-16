@@ -17,6 +17,36 @@
 		<put-attribute name="footer" value="/WEB-INF/tiles/footer.jsp"></put-attribute>
 	</definition>
 
+	<definition name="logoutfailed" template="/WEB-INF/templates/default.jsp">
+		<put-attribute name="title" value="Forum: Your economics blog feed"></put-attribute>
+		<put-attribute name="header" value="/WEB-INF/tiles/header.jsp"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/tiles/logoutfailed.jsp"></put-attribute>
+		<put-attribute name="footer" value="/WEB-INF/tiles/footer.jsp"></put-attribute>
+	</definition>
+
+	<definition name="accountcreated" template="/WEB-INF/templates/default.jsp">
+		<put-attribute name="title" value="Forum: Your economics blog feed"></put-attribute>
+		<put-attribute name="header" value="/WEB-INF/tiles/header.jsp"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/tiles/accountcreated.jsp"></put-attribute>
+		<put-attribute name="footer" value="/WEB-INF/tiles/footer.jsp"></put-attribute>
+	</definition>
+
+	<definition name="successfullogout" template="/WEB-INF/templates/default.jsp">
+		<put-attribute name="title" value="Forum: Your economics blog feed"></put-attribute>
+		<put-attribute name="header" value="/WEB-INF/tiles/header.jsp"></put-attribute>
+		<put-attribute name="content"
+			value="/WEB-INF/tiles/successfullogout.jsp"></put-attribute>
+		<put-attribute name="footer" value="/WEB-INF/tiles/footer.jsp"></put-attribute>
+	</definition>
+
+	<definition name="logout" template="/WEB-INF/templates/default.jsp">
+		<put-attribute name="title" value="Forum: Your economics blog feed"></put-attribute>
+		<put-attribute name="header" value="/WEB-INF/tiles/header.jsp"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/tiles/logout.jsp"></put-attribute>
+		<put-attribute name="footer" value="/WEB-INF/tiles/footer.jsp"></put-attribute>
+	</definition>
+
+
 	<definition name="fetchrss" template="/WEB-INF/templates/default.jsp">
 		<put-attribute name="title" value="Forum: Your economics blog feed"></put-attribute>
 		<put-attribute name="header" value="/WEB-INF/tiles/header.jsp"></put-attribute>

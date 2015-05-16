@@ -2,24 +2,27 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<h3>Login with Username and Password</h3>
-<form name='f' action='${pageContext.request.contextPath}/login'
-	method='POST'>
-	<table>
-		<tr>
-			<td>User:</td>
-			<td><input type='text' name='username' value=''></td>
-		</tr>
-		<tr>
-			<td>Password:</td>
-			<td><input type='password' name='password' /></td>
-		</tr>
-		<tr>
-			<td colspan='2'><input name="submit" type="submit" value="Login" /></td>
-		</tr>
-	</table>
-	<input type="hidden" name="${_csrf.parameterName}"
-		value="${_csrf.token}" /> <br> 
-		<a
-		href="${pageContext.request.contextPath}/newaccount">New? Click here</a>
-</form>
+
+<div class="container">
+	<h3>Login with username and password</h3><br>
+	<form role="form" name='f'
+		action='${pageContext.request.contextPath}/login' method='POST'>
+		<div class="form-group">
+			<label for="user">User</label> <input type="text" name="username"
+				class="form-control" value="" />
+		</div>
+
+		<div class="form-group">
+			<label for="password">Password</label> <input type="password"
+				name="password" class="form-control" value="" />
+		</div>
+
+		<button type="submit" class="btn btn-primary">Submit</button>
+
+		<input type="hidden" name="${_csrf.parameterName}"
+			value="${_csrf.token}" /> 
+	</form>
+</div>
+<div class="container">
+	<a href="${pageContext.request.contextPath}/newaccount">New? Click here</a>
+</div>

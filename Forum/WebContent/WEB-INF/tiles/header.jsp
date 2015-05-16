@@ -20,8 +20,14 @@
 
 			<sec:authorize access="isAuthenticated()">
 				<td class="text-right col-sm-4"><a class="btn btn-primary"
-					href="j_spring_security_logout">Logout</a></td>
+					href="${pageContext.request.contextPath}/logout">Logout</a></td>
 			</sec:authorize>
+
+			<sec:authorize access="isAuthenticated()">
+				<td class="text-right col-sm-4"><a class="btn btn-primary"
+					href="${pageContext.request.contextPath}/account">Account</a></td>
+			</sec:authorize>
+
 		</tr>
 	</table>
 </header>

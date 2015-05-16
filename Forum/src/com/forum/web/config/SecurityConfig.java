@@ -37,12 +37,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
  
 	  http.authorizeRequests()
-	  	.antMatchers("/", "/login").permitAll()
-	  	.antMatchers("/newaccount").permitAll()
+	  	.antMatchers("/", "/login", "/logout", "/successfullogout", "/failedlogout").permitAll()
+	  	.antMatchers("/newaccount", "/createaccount").permitAll()
 		.antMatchers("/fetchrss", "/dofetch").access("hasRole('ADMIN')")
 		.and().formLogin().loginPage("/login")
 		.usernameParameter("username")
-		.passwordParameter("password");
+		.passwordParameter("password")
+		.and().logout().logoutUrl("/logout")
+		.and().authorizeRequests().anyRequest().denyAll();
 	}
 	
 	@Bean
